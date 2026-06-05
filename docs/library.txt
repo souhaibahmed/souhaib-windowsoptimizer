@@ -1,0 +1,76 @@
+Browsers:
+Brave
+Google Chrome
+Chromium
+Firefox
+Waterfox
+Opera
+Opera GX
+Tor
+Librewolf
+Zen
+
+
+
+Comunication:
+Discord
+Vencord
+Teams
+Zoom
+Telegram
+WhatsApp
+
+
+Media/Documents:
+VLC
+K-Lite Codecs
+Audacity
+Spotify
+OBS Studio
+Adobe Acrobat Reader
+
+
+Gaming:
+Steam
+Epic Games
+GOG Galaxy
+EA App
+Ubisoft Connect
+Minecraft Launcher
+Playnite
+PPSSPP
+
+
+System Monitoring:
+MSI afterburner
+Rivatuner
+HWInfo
+CPU-Z
+GPU-Z
+CrystalDiskInfo
+
+
+
+Utilities:
+Anydesk
+TeamViewer
+Revo Uninstaller
+Everything
+Winrar 
+7-zip
+PeaZip
+Powertoys
+Share X
+LocalSend
+Internet Download Manager
+Neat Download Manager
+Free Download Manager
+Game Save Manager
+
+
+Developer Tools:
+Python 3
+Git
+Notepad
+Visual Studio Code
+

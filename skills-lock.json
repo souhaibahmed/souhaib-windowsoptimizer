@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "claude-api": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/claude-api/SKILL.md",
+      "computedHash": "3d1c50b50f7640b225dcd9b3b29a3983406b342c22e9f0ed4cb65a92451b7bf2"
+    },
+    "everything-claude-code-conventions": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/everything-claude-code/SKILL.md",
+      "computedHash": "3d259d2c36a18bb0f9ac2b65018a8962dea8d0aca71f4f0b7b9c59a0e2b54779"
+    }
+  }
+}
