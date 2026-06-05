@@ -68,12 +68,13 @@ function Invoke-DependencyCheck {
     }
 
     # --- Write to temp file ---
-    @"
+    $tempContent = @"
 WIN_VERSION=$winVersion
 WINGET=$(if ($wingetAvailable) { "1" } else { "0" })
 GPU=$gpuBrand
 PSWindowsUpdate=$(if ($psWindowsUpdateAvailable) { "1" } else { "0" })
-"@ | Set-Content -Path "$env:TEMP\wo_session.tmp" -Force
+"@
+    $tempContent | Set-Content -Path "$env:TEMP\wo_session.tmp" -Force
 
     Write-Host ""
 }
