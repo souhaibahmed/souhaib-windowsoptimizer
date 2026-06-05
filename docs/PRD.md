@@ -4,6 +4,8 @@
 
 PowerShell-based Windows optimization tool distributed via `irm <url> | iex`. Runs entirely inside the PowerShell terminal with no GUI. Detects the OS version and dependencies on launch, stores results in a temp file, then routes the user to the correct branch. v1.0 targets Windows 10/11, Gaming profile only. The tool covers privacy hardening, debloating, app installation via a library-driven picker, driver updates, and a bundled performance optimization routine. All code is original — no copying from referenced projects.
 
+**Execution policy handling:** On first run, the script auto-sets `RemoteSigned` for `CurrentUser` scope so subsequent runs work without manual policy changes. Detects Constrained Language Mode (WDAC/AppLocker) and prints a clear error with workarounds if present.
+
 ---
 
 ## Repository Structure
@@ -22,11 +24,13 @@ windows-optimizer/
 
 ### Responsibilities
 
-1. Detect Windows version via `(Get-WmiObject Win32_OperatingSystem).Version`
-2. Check and auto-install dependencies
-3. Store results in temp file
-4. Route user to the correct branch script
-5. Register cleanup task on exit and shutdown/restart
+1. Self-heal execution policy (`Set-ExecutionPolicy RemoteSigned` for `CurrentUser`)
+2. Detect Constrained Language Mode (WDAC/AppLocker) and abort with workaround instructions
+3. Detect Windows version via `(Get-WmiObject Win32_OperatingSystem).Version`
+4. Check and auto-install dependencies
+5. Store results in temp file
+6. Route user to the correct branch script
+7. Register cleanup task on exit and shutdown/restart
 
 ### Dependency Checks
 
@@ -348,6 +352,8 @@ powercfg /hibernate off
 | Runtime install fails | Skip, add to failed list, show in summary |
 | Temp file not found mid-session | Re-run dependency check inline, recreate file |
 | Unsupported OS | Exit with message, no changes applied |
+| Execution policy blocks script | Auto-heal via `Set-ExecutionPolicy RemoteSigned` at startup |
+| Constrained Language Mode (WDAC/AppLocker) | Exit with error message listing workarounds |
 
 ---
 

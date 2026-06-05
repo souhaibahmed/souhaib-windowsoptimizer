@@ -4,11 +4,16 @@
 
 ## Installation
 
-Run the following command in an elevated PowerShell window:
+Run the following command in an elevated **PowerShell** window:
 
-```
+```powershell
 irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex
 ```
+
+> If your system blocks `.ps1` files (default `Restricted` policy), paste this into **any** terminal (cmd.exe or PowerShell):
+> ```
+> powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex"
+> ```
 
 ## Overview
 

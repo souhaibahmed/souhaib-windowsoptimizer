@@ -14,13 +14,25 @@
 
 ## Quick Start
 
-Run this **one line** in an elevated PowerShell terminal (Win + X → _Terminal (Admin)_):
+Open **PowerShell as Administrator** (Win + X → _Terminal (Admin)_), then run:
 
 ```powershell
 irm https://raw.githubusercontent.com/souhaibahmed/souhaib-windowsoptimizer/v1.2-iex-support/setup.ps1 | iex
 ```
 
+> ⚠️ **Must be PowerShell, not Command Prompt (cmd.exe).** The `irm ... | iex` one-liner only works inside PowerShell.
+
 That's it. No download, no install, no dependencies to manage. The script auto-elevates if you forgot to run as Administrator, detects your Windows version, checks for `winget` and `PSWindowsUpdate`, and presents an interactive menu — all in under a second.
+
+### If execution policy blocks you
+
+If your system blocks running `.ps1` files (default `Restricted` policy), use this **cmd.exe-compatible** command instead:
+
+```cmd
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/souhaibahmed/souhaib-windowsoptimizer/v1.2-iex-support/setup.ps1 | iex"
+```
+
+This works from **Command Prompt**, **PowerShell**, **Win+R (Run)**, or any batch file. The `-ExecutionPolicy Bypass` flag overrides Restricted policy for that session. Once the script runs, it automatically sets your execution policy to `RemoteSigned` so future runs work normally.
 
 ---
 
@@ -199,6 +211,52 @@ windows-optimizer/
 | App/runtime install fails | Add to failed list, show in end summary |
 | Unsupported OS | Print message, exit without changes |
 | Temp file lost mid-session | Re-run dependency check inline |
+
+---
+
+## Troubleshooting
+
+### "irm ... | iex" doesn't work / command not recognized
+
+You're likely in **Command Prompt (cmd.exe)**, not PowerShell. The `irm` and `iex` commands are PowerShell-specific. Open **PowerShell** (Win + X → _Terminal (Admin)_) and try again.
+
+Alternatively, paste this into **any** terminal (cmd or PowerShell):
+
+```cmd
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/souhaibahmed/souhaib-windowsoptimizer/v1.2-iex-support/setup.ps1 | iex"
+```
+
+### "Cannot be loaded because running scripts is disabled on this system"
+
+This is the default PowerShell **Execution Policy** (`Restricted`). The `irm | iex` one-liner usually bypasses this because it evaluates code in memory rather than running a `.ps1` file, but if you've downloaded the script directly, use:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
+```
+
+Or set the policy permanently (once):
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+```
+
+Windows Optimizer does this automatically on first run, so next time it will work with just `.\setup.ps1`.
+
+### "Constrained Language Mode" or "iex is not supported"
+
+Your system has **Windows Defender Application Control (WDAC)** or **AppLocker** enabled — common on enterprise-managed devices. This lockdown prevents `iex` and most script execution entirely.
+
+**Workarounds:**
+1. Run the bypass command from **cmd.exe** (see above) — may still be blocked if fully locked down
+2. Download the [release ZIP](https://github.com/souhaibahmed/souhaib-windowsoptimizer/archive/refs/heads/main.zip) and extract it, then run the bypass
+3. If you control the device policy, disable Constrained Language Mode via:
+   - `gpedit.msc` → Computer Configuration → Administrative Templates → Windows Components → Windows Defender Application Control → **Turn on Virtualization Based Security** → Disabled
+4. On personal devices: disable Memory Integrity in **Windows Security → Device Security → Core Isolation**
+
+### "Access Denied" / permission errors
+
+You need **Administrator privileges**. Either:
+- Right-click PowerShell → _Run as Administrator_
+- Or let the script auto-elevate (it will prompt for UAC)
 
 ---
 

@@ -4,7 +4,7 @@
 >
 > **Git tag:** `v1.0`
 >
-> **Install:** `irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex`
+> **Install:** `irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex` (PowerShell). If execution policy blocks scripts, use: `powershell -NoProfile -ExecutionPolicy Bypass -Command "irm ... | iex"`
 
 ---
 
@@ -29,7 +29,7 @@
 
 ## 1. Project Overview
 
-Windows Optimizer is a **PowerShell-based Windows optimization tool** distributed via the `irm <url> | iex` one-liner pattern. It runs entirely inside the PowerShell terminal (no GUI), targets **Windows 10/11 Gaming profile**, and covers:
+Windows Optimizer is a **PowerShell-based Windows optimization tool** distributed via the `irm <url> | iex` one-liner pattern (run from PowerShell). If execution policy blocks `.ps1` files, a `cmd.exe`-compatible bypass command is also provided. The script self-heals the execution policy on first run and detects Constrained Language Mode (WDAC/AppLocker) with actionable error messages. Runs entirely inside the PowerShell terminal (no GUI), targets **Windows 10/11 Gaming profile**, and covers:
 
 - Privacy & telemetry hardening
 - UWP app debloating

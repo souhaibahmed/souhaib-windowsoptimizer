@@ -4,6 +4,28 @@ param(
 
 $RepoBaseUrl = "https://raw.githubusercontent.com/souhaibahmed/souhaib-windowsoptimizer/v1.2-iex-support"
 
+# --- Self-heal execution policy (so .ps1 files work on future runs) ---
+$currentPolicy = Get-ExecutionPolicy -Scope CurrentUser -ErrorAction SilentlyContinue
+if ($currentPolicy -eq 'Restricted' -or $currentPolicy -eq 'Undefined') {
+    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force -ErrorAction SilentlyContinue
+}
+
+# --- Detect Constrained Language Mode (WDAC/AppLocker lockdown) ---
+if ($ExecutionContext.SessionState.LanguageMode -eq 'ConstrainedLanguage') {
+    Write-Host "ERROR: Your system restricts PowerShell (Constrained Language Mode)." -ForegroundColor Red
+    Write-Host "" -ForegroundColor Yellow
+    Write-Host "This is typically enforced by Windows Defender Application Control (WDAC)" -ForegroundColor Yellow
+    Write-Host "or AppLocker. Windows Optimizer cannot run under these restrictions." -ForegroundColor Yellow
+    Write-Host "" -ForegroundColor Yellow
+    Write-Host "To run Windows Optimizer, try one of these:" -ForegroundColor DarkGray
+    Write-Host "  1. Run this from an elevated PowerShell prompt (Win+X → Terminal (Admin))" -ForegroundColor Cyan
+    Write-Host "  2. Use: powershell -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -ForegroundColor Cyan
+    Write-Host "  3. Or bypass CLM via Group Policy (Computer Config → Admin Templates →" -ForegroundColor Cyan
+    Write-Host "     Windows Components → Windows Defender Application Control →" -ForegroundColor Cyan
+    Write-Host "     'Turn on Virtualization Based Security' → Disabled)" -ForegroundColor Cyan
+    exit 1
+}
+
 # --- Resolve script root (works both from file and via iex) ---
 $ScriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { $null }
 if (-not $ScriptRoot) {
