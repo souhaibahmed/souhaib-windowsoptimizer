@@ -22,7 +22,7 @@ irm https://raw.githubusercontent.com/souhaibahmed/souhaib-windowsoptimizer/v1.2
 
 > ⚠️ **Must be PowerShell, not Command Prompt (cmd.exe).** The `irm ... | iex` one-liner only works inside PowerShell.
 
-That's it. No download, no install, no dependencies to manage. The script auto-elevates if you forgot to run as Administrator, detects your Windows version, checks for `winget` and `PSWindowsUpdate`, and presents an interactive menu — all in under a second.
+That's it. No download, no install, no dependencies to manage. The script auto-elevates if you forgot to run as Administrator, detects your Windows version, checks for `winget`, and presents an interactive menu — all in under a second.
 
 ### If execution policy blocks you
 
@@ -120,12 +120,6 @@ Browse 47 apps across 7 categories in a multi-column terminal picker with keyboa
 
 ### 4. Update Drivers
 
-Two-phase driver update in a single run:
-
-**Phase 1 — Windows & Driver Updates**
-Uses `PSWindowsUpdate` to fetch driver and quality updates from Microsoft Update catalog. Checks for required reboot.
-
-**Phase 2 — All-in-One Runtimes**
 Installs essential game-ready runtimes via winget:
 
 - Microsoft Visual C++ 2015-2022 (x64 + x86)
@@ -170,7 +164,7 @@ Also creates a **System Restore Point** before applying changes.
 - **PowerShell 5.1+** (ships with Windows 10/11)
 - Internet connection for winget operations
 
-No external dependencies to pre-install. `winget` and `PSWindowsUpdate` are auto-installed on first run if absent.
+No external dependencies to pre-install. `winget` is auto-installed on first run if absent.
 
 ---
 
@@ -194,7 +188,7 @@ windows-optimizer/
 ## Design Principles
 
 - **Single-file distribution** — `irm | iex` pattern, no installer, no package manager
-- **Zero dependencies to start** — auto-installs winget and PSWindowsUpdate if missing
+- **Zero dependencies to start** — auto-installs winget if missing
 - **Resilient error handling** — every mutating operation is wrapped in try/catch; a single failure never aborts the full run
 - **Original code** — nothing copied from ChrisTitusTech, Windows10Debloater, or any third-party project
 - **Clean exit** — temp files removed on exit; fallback scheduled task cleans up on next boot if the process is killed
@@ -206,7 +200,7 @@ windows-optimizer/
 | Scenario | Behavior |
 |---|---|
 | winget not found | Auto-install via AppxPackage, retry once, graceful skip |
-| PSWindowsUpdate not found | Auto-install via PSGallery, graceful skip |
+
 | Registry write fails | Log ✗, continue to next change |
 | App/runtime install fails | Add to failed list, show in end summary |
 | Unsupported OS | Print message, exit without changes |

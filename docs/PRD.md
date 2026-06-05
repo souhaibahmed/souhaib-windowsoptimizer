@@ -37,7 +37,6 @@ windows-optimizer/
 | Dependency | Check | Action if missing |
 |---|---|---|
 | `winget` | `Get-Command winget` | Auto-install via `Add-AppxPackage` (Microsoft.DesktopAppInstaller) |
-| `PSWindowsUpdate` | `Get-Module -ListAvailable` | `Install-Module -Name PSWindowsUpdate -Force` |
 | GPU brand | `Get-WmiObject Win32_VideoController` | Detect NVIDIA / AMD / Intel, store result |
 | PowerShell version | `$PSVersionTable.PSVersion` | Warn if below 5.1 |
 
@@ -50,7 +49,6 @@ windows-optimizer/
   WIN_VERSION=10|11
   WINGET=1|0
   GPU=NVIDIA|AMD|INTEL|UNKNOWN
-  PSWindowsUpdate=1|0
   ```
 - Deletion:
   - Explicit: `Remove-Item` at script exit (all paths including user-initiated exit)
@@ -241,21 +239,7 @@ Install complete.
 
 ### Feature 4 — Update Drivers
 
-Two-phase: Microsoft Update catalog via PSWindowsUpdate, then runtimes via winget.
-
-#### Phase 1 — Windows Update Drivers
-
-```powershell
-Import-Module PSWindowsUpdate
-Get-WindowsUpdate -UpdateType Driver -MicrosoftUpdate -AcceptAll -Install
-```
-
-- Runs silently, outputs progress
-- If reboot required: notify user, do not auto-reboot
-
-#### Phase 2 — All-in-One Runtimes
-
-Install via winget. Targets:
+Install gaming runtimes via winget. Targets:
 
 ```
 Microsoft.VCRedist.2015+.x64
@@ -346,7 +330,6 @@ powercfg /hibernate off
 | Scenario | Behavior |
 |---|---|
 | winget not found | Auto-install, retry once, abort app features if still missing |
-| PSWindowsUpdate not found | Auto-install, retry once, skip driver feature if still missing |
 | Registry key write fails | Log failure, continue to next action |
 | App install fails | Skip, add to failed list, show in summary |
 | Runtime install fails | Skip, add to failed list, show in summary |

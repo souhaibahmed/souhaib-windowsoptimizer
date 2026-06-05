@@ -26,14 +26,13 @@
 
 - Implement all dependency checks per the PRD table:
   - `winget` check → auto-install via `Add-AppxPackage` if missing
-  - `PSWindowsUpdate` check → `Install-Module -Name PSWindowsUpdate -Force` if missing
   - GPU brand detection via `Get-WmiObject Win32_VideoController`
   - PowerShell version check → warn if below 5.1
 - Write all results to `wo_session.tmp`
 - Temp file re-creation logic if file goes missing mid-session
 
 **Definition of Done:**
-- All four dependencies are checked, auto-installed if possible, and results are persisted in the temp file. Re-running the check recreates the file correctly.
+- All dependencies are checked, auto-installed if possible, and results are persisted in the temp file. Re-running the check recreates the file correctly.
 
 ---
 
@@ -87,13 +86,11 @@
 
 **Files:** `windows10-11/optimize.ps1`
 
-- Phase 1: `Get-WindowsUpdate -UpdateType Driver -MicrosoftUpdate -AcceptAll -Install` via PSWindowsUpdate
-  - Notify user if reboot is required (no auto-reboot)
-- Phase 2: Install all-in-one runtimes via winget (VCRedist x64/x86, DirectX, .NET Runtime 8, .NET Desktop 8, XNA Redist)
+- Install all-in-one runtimes via winget (VCRedist x64/x86, DirectX, .NET Runtime 8, .NET Desktop 8, XNA Redist)
 - Same skip-and-log error model as app installer
 
 **Definition of Done:**
-- Selecting option [4] from the main menu runs both driver updates and runtime installs, logging results for each.
+- Selecting option [4] from the main menu installs runtimes, logging results for each.
 
 ---
 

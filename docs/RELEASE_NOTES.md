@@ -27,7 +27,7 @@ Windows Optimizer is a PowerShell-based utility that streamlines the configurati
 
 3. **Install Apps** — Interactive multi-column menu for batch-installing applications through winget. Supports Gaming, Browsers, Programming, and System categories. Automatically detects the GPU brand and surfaces the corresponding vendor software (NVIDIA App, AMD Adrenalin, or Intel Arc Control).
 
-4. **Update Drivers** — Two-phase driver update: Phase 1 fetches driver updates from Windows Update via the PSWindowsUpdate module; Phase 2 installs essential runtimes (VC++ redistributables, DirectX, .NET 8.0, XNA Framework) through winget.
+4. **Update Drivers** — Installs essential runtimes (VC++ redistributables, DirectX, .NET 8.0, XNA Framework) through winget.
 
 5. **Optimize System** — Applies eight performance tweaks in one pass: disables P2P Delivery Optimization, sets maximum monitor refresh rate, disables mouse acceleration, enables High Performance power plan, switches visual effects to performance mode, disables Xbox Game Bar, removes startup delay, and disables hibernation.
 

@@ -41,7 +41,7 @@ Windows Optimizer is a **PowerShell-based Windows optimization tool** distribute
 - Privacy & telemetry hardening
 - UWP app debloating
 - Application installation via an interactive picker
-- Driver updates (Windows Update + runtimes)
+- Driver updates (runtime components via winget)
 - System performance optimization
 
 ### Constraints
@@ -61,11 +61,11 @@ Windows Optimizer is a **PowerShell-based Windows optimization tool** distribute
 
 ```
 windows-optimizer/
-├── setup.ps1                  # Entry point (226 lines)
+├── setup.ps1                  # Entry point (210 lines)
 ├── library.ps1                # App registry (40 lines)
 ├── Summary.md                 # This file
 ├── windows10-11/
-│   └── optimize.ps1           # Gaming branch, all 5 features (896 lines)
+│   └── optimize.ps1           # Gaming branch, all 5 features (1038 lines)
 └── docs/
     ├── PRD.md                 # Product requirements (374 lines)
     ├── talks.md               # Milestone definitions (149 lines)
@@ -156,21 +156,6 @@ function Invoke-DependencyCheck {
         Write-Host "✓ winget: available" -ForegroundColor Green
     }
 
-    # --- Dependency: PSWindowsUpdate ---
-    $psWindowsUpdateAvailable = $null -ne (Get-Module -ListAvailable -Name PSWindowsUpdate -ErrorAction SilentlyContinue)
-    if (-not $psWindowsUpdateAvailable) {
-        Write-Host "⚠ PSWindowsUpdate: not available, attempting install..." -ForegroundColor Yellow
-        Install-Module -Name PSWindowsUpdate -Force -ErrorAction SilentlyContinue
-        $psWindowsUpdateAvailable = $null -ne (Get-Module -ListAvailable -Name PSWindowsUpdate -ErrorAction SilentlyContinue)
-        if ($psWindowsUpdateAvailable) {
-            Write-Host "✓ PSWindowsUpdate: installed" -ForegroundColor Green
-        } else {
-            Write-Host "⚠ PSWindowsUpdate: not available" -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "✓ PSWindowsUpdate: available" -ForegroundColor Green
-    }
-
     # --- Dependency: GPU Brand ---
     $gpu = Get-WmiObject Win32_VideoController -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($gpu -and $gpu.Name -match "NVIDIA") {
@@ -198,7 +183,6 @@ function Invoke-DependencyCheck {
 WIN_VERSION=$winVersion
 WINGET=$(if ($wingetAvailable) { "1" } else { "0" })
 GPU=$gpuBrand
-PSWindowsUpdate=$(if ($psWindowsUpdateAvailable) { "1" } else { "0" })
 SCRIPT_ROOT=$ScriptRoot
 "@
     $tempContent | Set-Content -Path "$env:TEMP\wo_session.tmp" -Force
@@ -822,48 +806,8 @@ function Invoke-UpdateDrivers {
     Write-Host "=== Update Drivers ===" -ForegroundColor Cyan
     Write-Host ""
 
-    # --- Phase 1: Windows Update Drivers ---
-    Write-Host "Phase 1 — Windows Update Drivers" -ForegroundColor Cyan
-    Write-Host ""
-
-    $tempFile = "$env:TEMP\wo_session.tmp"
-    if (-not (Test-Path $tempFile)) {
-        $null = Invoke-DependencyCheck (Get-WmiObject Win32_OperatingSystem).Version 2>&1
-    }
-    $pswuEnabled = $false
-    if (Test-Path $tempFile) {
-        $content = Get-Content $tempFile -Raw -ErrorAction SilentlyContinue
-        if ($content -match "PSWindowsUpdate=1") {
-            $pswuEnabled = $true
-        }
-    }
-
-    if (-not $pswuEnabled) {
-        Write-Host "  ⚠ PSWindowsUpdate module not requested. Skipping Windows Update drivers." -ForegroundColor Yellow
-    } else {
-        try {
-            Import-Module PSWindowsUpdate -ErrorAction Stop
-            $updates = Get-WindowsUpdate -UpdateType Driver -MicrosoftUpdate -AcceptAll -Install -ErrorAction Stop
-            Write-Host "  ✓ Windows Update driver check complete" -ForegroundColor Green
-            $needsReboot = $false
-            if ($updates) {
-                foreach ($u in $updates) {
-                    if ($u.RebootRequired) { $needsReboot = $true; break }
-                }
-            }
-            if ($needsReboot) {
-                Write-Host "  ⚠ A reboot is required to complete driver installation." -ForegroundColor Yellow
-                Write-Host "    Please reboot your system at your convenience." -ForegroundColor DarkGray
-            }
-        } catch {
-            Write-Host "  ✗ Windows Update driver phase failed: $_" -ForegroundColor Red
-        }
-    }
-
-    Write-Host ""
-
-    # --- Phase 2: All-in-One Runtimes ---
-    Write-Host "Phase 2 — All-in-One Runtimes" -ForegroundColor Cyan
+    # --- Install Runtimes via winget ---
+    Write-Host "Installing runtime components..." -ForegroundColor Cyan
     Write-Host ""
 
     $runtimes = @(
@@ -875,7 +819,6 @@ function Invoke-UpdateDrivers {
         @{ Name = "Microsoft XNA Framework Redist"; ID = "Microsoft.XNARedist" }
     )
 
-    # --- Check winget availability for Phase 2 ---
     $wingetAvailable = $null -ne (Get-Command winget -ErrorAction SilentlyContinue)
     if (-not $wingetAvailable) {
         Write-Host "⚠ winget is not available. Skipping runtime installation." -ForegroundColor Yellow
@@ -1298,15 +1241,14 @@ finally {
 **Files:** `setup.ps1`
 
 **What was built:**
-- Implemented `Invoke-DependencyCheck` function covering all four dependencies:
+- Implemented `Invoke-DependencyCheck` function covering all dependencies:
   - **winget:** `Get-Command winget` → auto-install via `Get-AppxPackage` (user) → `Get-AppxProvisionedPackage` (system) fallback
-  - **PSWindowsUpdate:** `Get-Module -ListAvailable` → `Install-Module -Name PSWindowsUpdate -Force` if missing
   - **GPU brand:** `Get-WmiObject Win32_VideoController` → NVIDIA/AMD/Intel/UNKNOWN
   - **PowerShell version:** `$PSVersionTable.PSVersion` → warning if below 5.1
 - Writes results to `wo_session.tmp` (key=value format)
 - Temp file re-creation logic via `-RepairSession` parameter for mid-session recovery
 
-**Definition of Done:** All four dependencies are checked, auto-installed if possible, and results persisted in the temp file. Re-running the check recreates the file correctly.
+**Definition of Done:** All dependencies are checked, auto-installed if possible, and results persisted in the temp file. Re-running the check recreates the file correctly.
 
 ---
 
@@ -1388,12 +1330,7 @@ finally {
 **Files:** `windows10-11/optimize.ps1` — `Invoke-UpdateDrivers`
 
 **What was built:**
-- **Phase 1 — Windows Update Drivers:**
-  - Checks temp file for `PSWindowsUpdate=1`
-  - Imports PSWindowsUpdate module
-  - Runs `Get-WindowsUpdate -UpdateType Driver -MicrosoftUpdate -AcceptAll -Install`
-  - Notifies if reboot is required (no auto-reboot)
-- **Phase 2 — All-in-One Runtimes (via winget):**
+- **All-in-One Runtimes (via winget):**
   - Microsoft Visual C++ 2015-2022 x64
   - Microsoft Visual C++ 2015-2022 x86
   - Microsoft DirectX
@@ -1583,7 +1520,7 @@ Missing closing '}' in statement block or type definition.
 
 **Discovered during:** Milestone 8 audit
 
-**Root cause:** If the temp file `wo_session.tmp` was deleted mid-session, Features 3 and 4 would have no GPU or PSWindowsUpdate data.
+**Root cause:** If the temp file `wo_session.tmp` was deleted mid-session, Features 3 and 4 would have no GPU data.
 
 **Fix:** Both features now check for the temp file before reading it, and if missing, call `Invoke-DependencyCheck` inline to recreate it:
 ```powershell
@@ -1684,7 +1621,7 @@ If execution policy blocks scripts:
 1. Privacy and Telemetry Hardening
 2. Debloat Windows (24 UWP packages)
 3. Install Apps (interactive picker + GPU injection)
-4. Update Drivers (PSWindowsUpdate + 6 runtimes)
+4. Update Drivers (6 runtimes via winget)
 5. Optimize System (8 performance tweaks)
 
 ## Requirements: Windows 10/11, Administrator
@@ -1700,7 +1637,7 @@ If execution policy blocks scripts:
 [1] Privacy & Telemetry      → Invoke-PrivacyTelemetry     → 10 reg + 2 services
 [2] Debloat Windows          → Invoke-DebloatWindows       → 24 UWP packages
 [3] Install Apps             → Invoke-AppInstaller         → Interactive picker + winget
-[4] Update Drivers           → Invoke-UpdateDrivers        → PSWinUpdate + 6 runtimes
+[4] Update Drivers           → Invoke-UpdateDrivers        → 6 runtimes via winget
 [5] Optimize System          → Invoke-OptimizeSystem       → 8 performance tweaks
 [0] Exit                     → Cleanup + return
 ```
@@ -1709,11 +1646,11 @@ If execution policy blocks scripts:
 
 | Function | File | Lines | Purpose |
 |---|---|---|---|
-| `Invoke-DependencyCheck` | `setup.ps1` | 76 | Check/install winget, PSWindowsUpdate, GPU, PS version |
+| `Invoke-DependencyCheck` | `setup.ps1` | 61 | Check/install winget, GPU, PS version |
 | `Invoke-PrivacyTelemetry` | `optimize.ps1` | 77 | Apply 10 reg + 2 service changes |
 | `Invoke-DebloatWindows` | `optimize.ps1` | 70 | Remove 24 UWP packages |
 | `Invoke-AppInstaller` | `optimize.ps1` | 287 | Interactive picker + winget install |
-| `Invoke-UpdateDrivers` | `optimize.ps1` | 110 | PSWindowsUpdate + winget runtimes |
+| `Invoke-UpdateDrivers` | `optimize.ps1` | 65 | Runtimes via winget |
 | `Invoke-OptimizeSystem` | `optimize.ps1` | 293 | 8 optimization tweaks |
 | `Show-Menu` | `optimize.ps1` | 20 | Main menu rendering |
 | `Get-MaxRows` | `optimize.ps1` | 5 | Helper for picker layout |
@@ -1721,13 +1658,13 @@ If execution policy blocks scripts:
 ### File Line Counts
 
 | File | Lines |
-|---|---|
-| `setup.ps1` | 226 |
+|---|---|---|
+| `setup.ps1` | 210 |
 | `library.ps1` | 40 |
-| `windows10-11/optimize.ps1` | 896 |
+| `windows10-11/optimize.ps1` | 1038 |
 | `docs/PRD.md` | 374 |
 | `docs/talks.md` | 149 |
 | `docs/RELEASE_NOTES.md` | 45 |
 | `Summary.md` | This file |
-| **Total (code)** | **1,162** |
-| **Total (all)** | **~1,730** |
+| **Total (code)** | **1,288** |
+| **Total (all)** | **~1,860** |

@@ -517,59 +517,8 @@ function Invoke-UpdateDrivers {
     Write-Host "=== Update Drivers ===" -ForegroundColor Cyan
     Write-Host ""
 
-    # --- Phase 1: Windows & Driver Updates ---
-    Write-Host "Phase 1 — Windows & Driver Updates" -ForegroundColor Cyan
-    Write-Host ""
-
-    $tempFile = "$env:TEMP\wo_session.tmp"
-    if (-not (Test-Path $tempFile)) {
-        $null = Invoke-DependencyCheck (Get-WmiObject Win32_OperatingSystem).Version 2>&1
-    }
-    $pswuEnabled = $false
-    if (Test-Path $tempFile) {
-        $content = Get-Content $tempFile -Raw -ErrorAction SilentlyContinue
-        if ($content -match "PSWindowsUpdate=1") {
-            $pswuEnabled = $true
-        }
-    }
-
-    if (-not $pswuEnabled) {
-        Write-Host "  ⚠ PSWindowsUpdate module not requested. Skipping Windows Update and driver updates." -ForegroundColor Yellow
-    } else {
-        try {
-            Import-Module PSWindowsUpdate -ErrorAction Stop
-
-            # Install all Windows updates (quality, security, etc.)
-            Write-Host "  Installing Windows updates..." -ForegroundColor DarkGray
-            $wuUpdates = Get-WindowsUpdate -MicrosoftUpdate -AcceptAll -Install -IgnoreReboot -ErrorAction Stop
-
-            # Install driver updates
-            Write-Host "  Installing driver updates..." -ForegroundColor DarkGray
-            $driverUpdates = Get-WindowsUpdate -UpdateType Driver -MicrosoftUpdate -AcceptAll -Install -IgnoreReboot -ErrorAction Stop
-
-            Write-Host "  ✓ Windows Update and driver check complete" -ForegroundColor Green
-
-            $needsReboot = $false
-            $allUpdates = @()
-            if ($wuUpdates) { $allUpdates += $wuUpdates }
-            if ($driverUpdates) { $allUpdates += $driverUpdates }
-            foreach ($u in $allUpdates) {
-                if ($u.RebootRequired) { $needsReboot = $true; break }
-            }
-
-            if ($needsReboot) {
-                Write-Host "  ⚠ A reboot is required to complete installation." -ForegroundColor Yellow
-                Write-Host "    Please reboot your system at your convenience." -ForegroundColor DarkGray
-            }
-        } catch {
-            Write-Host "  ✗ Windows Update phase failed: $_" -ForegroundColor Red
-        }
-    }
-
-    Write-Host ""
-
-    # --- Phase 2: All-in-One Runtimes ---
-    Write-Host "Phase 2 — All-in-One Runtimes" -ForegroundColor Cyan
+    # --- Install Runtimes via winget ---
+    Write-Host "Installing runtime components..." -ForegroundColor Cyan
     Write-Host ""
 
     $runtimes = @(
@@ -581,7 +530,6 @@ function Invoke-UpdateDrivers {
         @{ Name = "Microsoft XNA Framework Redist"; ID = "Microsoft.XNARedist" }
     )
 
-    # --- Check winget availability for Phase 2 ---
     $wingetAvailable = $null -ne (Get-Command winget -ErrorAction SilentlyContinue)
     if (-not $wingetAvailable) {
         Write-Host "⚠ winget is not available. Skipping runtime installation." -ForegroundColor Yellow

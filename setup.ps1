@@ -71,21 +71,6 @@ function Invoke-DependencyCheck {
         Write-Host "✓ winget: available" -ForegroundColor Green
     }
 
-    # --- Dependency: PSWindowsUpdate ---
-    $psWindowsUpdateAvailable = $null -ne (Get-Module -ListAvailable -Name PSWindowsUpdate -ErrorAction SilentlyContinue)
-    if (-not $psWindowsUpdateAvailable) {
-        Write-Host "⚠ PSWindowsUpdate: not available, attempting install..." -ForegroundColor Yellow
-        Install-Module -Name PSWindowsUpdate -Force -ErrorAction SilentlyContinue
-        $psWindowsUpdateAvailable = $null -ne (Get-Module -ListAvailable -Name PSWindowsUpdate -ErrorAction SilentlyContinue)
-        if ($psWindowsUpdateAvailable) {
-            Write-Host "✓ PSWindowsUpdate: installed" -ForegroundColor Green
-        } else {
-            Write-Host "⚠ PSWindowsUpdate: not available" -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "✓ PSWindowsUpdate: available" -ForegroundColor Green
-    }
-
     # --- Dependency: GPU Brand ---
     $gpu = Get-WmiObject Win32_VideoController -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($gpu -and $gpu.Name -match "NVIDIA") {
@@ -113,7 +98,6 @@ function Invoke-DependencyCheck {
 WIN_VERSION=$winVersion
 WINGET=$(if ($wingetAvailable) { "1" } else { "0" })
 GPU=$gpuBrand
-PSWindowsUpdate=$(if ($psWindowsUpdateAvailable) { "1" } else { "0" })
 SCRIPT_ROOT=$ScriptRoot
 "@
     $tempContent | Set-Content -Path "$env:TEMP\wo_session.tmp" -Force
