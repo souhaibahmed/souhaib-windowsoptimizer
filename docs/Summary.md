@@ -1,10 +1,17 @@
-# Windows Optimizer v1.0 — Full Project Summary
+# Windows Optimizer v1.5 — Full Project Summary
 
 > **Generated:** June 5, 2026
 >
-> **Git tag:** `v1.0`
+> **Git tag:** `v1.5`
 >
-> **Install:** `irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex` (PowerShell). If execution policy blocks scripts, use: `powershell -NoProfile -ExecutionPolicy Bypass -Command "irm ... | iex"`
+> **Install (PowerShell):**
+> ```powershell
+> irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex
+> ```
+> **If execution policy blocks .ps1 files (use from any terminal):**
+> ```cmd
+> powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex"
+> ```
 
 ---
 
@@ -54,15 +61,15 @@ Windows Optimizer is a **PowerShell-based Windows optimization tool** distribute
 
 ```
 windows-optimizer/
-├── setup.ps1                  # Entry point (184 lines)
+├── setup.ps1                  # Entry point (226 lines)
 ├── library.ps1                # App registry (40 lines)
 ├── Summary.md                 # This file
 ├── windows10-11/
 │   └── optimize.ps1           # Gaming branch, all 5 features (896 lines)
 └── docs/
-    ├── PRD.md                 # Product requirements (370 lines)
+    ├── PRD.md                 # Product requirements (374 lines)
     ├── talks.md               # Milestone definitions (149 lines)
-    └── RELEASE_NOTES.md       # v1.0 release notes (38 lines)
+    └── RELEASE_NOTES.md       # v1.5 release notes (45 lines)
 ```
 
 ---
@@ -72,13 +79,54 @@ windows-optimizer/
 ### 3.1 `setup.ps1` — Entry Point
 
 **Path:** `/home/baqir/Projects/Windows-optimizer/setup.ps1`
-**Lines:** 184
-**Purpose:** Admin check, OS detection, dependency checks, temp file management, routing, cleanup.
+**Lines:** 226
+**Purpose:** Admin check, execution-policy self-heal, CLM detection, sub-script download (for `irm | iex`), OS detection, dependency checks, temp file management, routing, cleanup.
 
 ```powershell
 param(
     [switch]$RepairSession
 )
+
+$RepoBaseUrl = "https://raw.githubusercontent.com/souhaibahmed/souhaib-windowsoptimizer/v1.2-iex-support"
+
+# --- Self-heal execution policy (so .ps1 files work on future runs) ---
+$currentPolicy = Get-ExecutionPolicy -Scope CurrentUser -ErrorAction SilentlyContinue
+if ($currentPolicy -eq 'Restricted' -or $currentPolicy -eq 'Undefined') {
+    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force -ErrorAction SilentlyContinue
+}
+
+# --- Detect Constrained Language Mode (WDAC/AppLocker lockdown) ---
+if ($ExecutionContext.SessionState.LanguageMode -eq 'ConstrainedLanguage') {
+    Write-Host "ERROR: Your system restricts PowerShell (Constrained Language Mode)." -ForegroundColor Red
+    Write-Host "" -ForegroundColor Yellow
+    Write-Host "This is typically enforced by Windows Defender Application Control (WDAC)" -ForegroundColor Yellow
+    Write-Host "or AppLocker. Windows Optimizer cannot run under these restrictions." -ForegroundColor Yellow
+    Write-Host "" -ForegroundColor Yellow
+    Write-Host "To run Windows Optimizer, try one of these:" -ForegroundColor DarkGray
+    Write-Host "  1. Run this from an elevated PowerShell prompt (Win+X → Terminal (Admin))" -ForegroundColor Cyan
+    Write-Host "  2. Use: powershell -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -ForegroundColor Cyan
+    Write-Host "  3. Or bypass CLM via Group Policy (Computer Config → Admin Templates →" -ForegroundColor Cyan
+    Write-Host "     Windows Components → Windows Defender Application Control →" -ForegroundColor Cyan
+    Write-Host "     'Turn on Virtualization Based Security' → Disabled)" -ForegroundColor Cyan
+    exit 1
+}
+
+# --- Resolve script root (works both from file and via iex) ---
+$ScriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { $null }
+if (-not $ScriptRoot) {
+    Write-Host "Downloading sub-scripts..." -ForegroundColor Yellow
+    $ScriptRoot = "$env:TEMP\wo-optimizer"
+    $null = New-Item -Path "$ScriptRoot\windows10-11" -ItemType Directory -Force -ErrorAction SilentlyContinue
+    try {
+        $resp = Invoke-WebRequest -Uri "$RepoBaseUrl/windows10-11/optimize.ps1" -UseBasicParsing -ErrorAction Stop
+        $resp.Content | Set-Content -Path "$ScriptRoot\windows10-11\optimize.ps1" -Force
+    } catch { Write-Host "✗ Failed to download optimize.ps1: $_" -ForegroundColor Red; exit 1 }
+    try {
+        $resp = Invoke-WebRequest -Uri "$RepoBaseUrl/library.ps1" -UseBasicParsing -ErrorAction Stop
+        $resp.Content | Set-Content -Path "$ScriptRoot\library.ps1" -Force
+    } catch { Write-Host "✗ Failed to download library.ps1: $_" -ForegroundColor Red; exit 1 }
+    Write-Host "✓ Sub-scripts downloaded" -ForegroundColor Green
+}
 
 function Invoke-DependencyCheck {
     param($winVersion)
@@ -151,6 +199,7 @@ WIN_VERSION=$winVersion
 WINGET=$(if ($wingetAvailable) { "1" } else { "0" })
 GPU=$gpuBrand
 PSWindowsUpdate=$(if ($psWindowsUpdateAvailable) { "1" } else { "0" })
+SCRIPT_ROOT=$ScriptRoot
 "@
     $tempContent | Set-Content -Path "$env:TEMP\wo_session.tmp" -Force
 
@@ -249,7 +298,7 @@ Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Ru
 # --- Routing ---
 try {
     if ($winVersion -eq "10" -or $winVersion -eq "11") {
-        & (Join-Path $PSScriptRoot "windows10-11\optimize.ps1")
+        & (Join-Path $ScriptRoot "windows10-11\optimize.ps1")
     } elseif ($winVersion -eq "8") {
         Write-Host "Windows 8 support coming soon!" -ForegroundColor Yellow
     } elseif ($winVersion -eq "7") {
@@ -1417,6 +1466,22 @@ finally {
 
 ---
 
+### Milestone 10 — v1.5: Execution Policy Self-Heal & CLM Detection
+
+**Files:** `setup.ps1`, `README.md`, `docs/PRD.md`, `docs/RELEASE_NOTES.md`, `docs/Summary.md`
+
+**What was built:**
+- **Execution policy self-heal** at script startup: detects if `CurrentUser` policy is `Restricted` or `Undefined` and auto-sets it to `RemoteSigned` so `.ps1` files work on all future runs without manual intervention
+- **Constrained Language Mode detection**: checks `$ExecutionContext.SessionState.LanguageMode` and exits with a clear, actionable error message if CLM is active (enforced by WDAC/AppLocker)
+- **Updated documentation** with:
+  - Clearer PowerShell-first install instructions
+  - `cmd.exe`-compatible bypass command for Restricted policy: `powershell -NoProfile -ExecutionPolicy Bypass -Command "irm <url> | iex"`
+  - Full Troubleshooting section covering execution policy, CLM, and permissions
+
+**Definition of Done:** Running `setup.ps1` on a system with `Restricted` execution policy auto-heals the policy and proceeds. Running on a CLM-locked system shows a helpful error with workarounds instead of failing silently.
+
+---
+
 ## 5. Errors Encountered & Fixes Applied
 
 ### Error 1: Here-string closing delimiter indentation
@@ -1603,14 +1668,17 @@ Defined in `docs/talks.md` (149 lines) — all 9 milestones with:
 
 ### 8.3 Release Notes
 
-File: `docs/RELEASE_NOTES.md` (38 lines)
+File: `docs/RELEASE_NOTES.md` (45 lines)
 
 ```
-# Release Notes — Windows Optimizer v1.0
-Release date: May 26, 2026
+# Release Notes — Windows Optimizer v1.5
+Release date: June 5, 2026
 
 ## Installation
-irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex
+Run in PowerShell:
+  irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex
+If execution policy blocks scripts:
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "irm ... | iex"
 
 ## Features
 1. Privacy and Telemetry Hardening
@@ -1654,12 +1722,12 @@ irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | i
 
 | File | Lines |
 |---|---|
-| `setup.ps1` | 184 |
+| `setup.ps1` | 226 |
 | `library.ps1` | 40 |
 | `windows10-11/optimize.ps1` | 896 |
-| `docs/PRD.md` | 370 |
+| `docs/PRD.md` | 374 |
 | `docs/talks.md` | 149 |
-| `docs/RELEASE_NOTES.md` | 38 |
+| `docs/RELEASE_NOTES.md` | 45 |
 | `Summary.md` | This file |
-| **Total (code)** | **1,120** |
-| **Total (all)** | **~1,677** |
+| **Total (code)** | **1,162** |
+| **Total (all)** | **~1,730** |
