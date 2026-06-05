@@ -218,7 +218,17 @@ function Invoke-AppInstaller {
     Clear-Host
 
     # --- 1. Load library ---
-    $libPath = Join-Path $PSScriptRoot "..\library.ps1"
+    $optimizeScriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { $null }
+    if (-not $optimizeScriptRoot) {
+        $tempFile = "$env:TEMP\wo_session.tmp"
+        if (Test-Path $tempFile) {
+            $tempContent = Get-Content $tempFile -Raw -ErrorAction SilentlyContinue
+            if ($tempContent -match "SCRIPT_ROOT=(.+)") {
+                $optimizeScriptRoot = Join-Path $Matches[1].Trim() "windows10-11"
+            }
+        }
+    }
+    $libPath = Join-Path $optimizeScriptRoot "..\library.ps1"
     if (-not (Test-Path $libPath)) {
         $libPath = ".\library.ps1"
     }

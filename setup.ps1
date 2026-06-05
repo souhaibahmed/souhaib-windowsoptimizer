@@ -2,6 +2,25 @@ param(
     [switch]$RepairSession
 )
 
+$RepoBaseUrl = "https://raw.githubusercontent.com/souhaibahmed/souhaib-windowsoptimizer/v1.2-iex-support"
+
+# --- Resolve script root (works both from file and via iex) ---
+$ScriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { $null }
+if (-not $ScriptRoot) {
+    Write-Host "Downloading sub-scripts..." -ForegroundColor Yellow
+    $ScriptRoot = "$env:TEMP\wo-optimizer"
+    $null = New-Item -Path "$ScriptRoot\windows10-11" -ItemType Directory -Force -ErrorAction SilentlyContinue
+    try {
+        $resp = Invoke-WebRequest -Uri "$RepoBaseUrl/windows10-11/optimize.ps1" -UseBasicParsing -ErrorAction Stop
+        $resp.Content | Set-Content -Path "$ScriptRoot\windows10-11\optimize.ps1" -Force
+    } catch { Write-Host "✗ Failed to download optimize.ps1: $_" -ForegroundColor Red; exit 1 }
+    try {
+        $resp = Invoke-WebRequest -Uri "$RepoBaseUrl/library.ps1" -UseBasicParsing -ErrorAction Stop
+        $resp.Content | Set-Content -Path "$ScriptRoot\library.ps1" -Force
+    } catch { Write-Host "✗ Failed to download library.ps1: $_" -ForegroundColor Red; exit 1 }
+    Write-Host "✓ Sub-scripts downloaded" -ForegroundColor Green
+}
+
 function Invoke-DependencyCheck {
     param($winVersion)
 
@@ -73,6 +92,7 @@ WIN_VERSION=$winVersion
 WINGET=$(if ($wingetAvailable) { "1" } else { "0" })
 GPU=$gpuBrand
 PSWindowsUpdate=$(if ($psWindowsUpdateAvailable) { "1" } else { "0" })
+SCRIPT_ROOT=$ScriptRoot
 "@
     $tempContent | Set-Content -Path "$env:TEMP\wo_session.tmp" -Force
 
@@ -171,7 +191,7 @@ Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Ru
 # --- Routing ---
 try {
     if ($winVersion -eq "10" -or $winVersion -eq "11") {
-        & (Join-Path $PSScriptRoot "windows10-11\optimize.ps1")
+        & (Join-Path $ScriptRoot "windows10-11\optimize.ps1")
     } elseif ($winVersion -eq "8") {
         Write-Host "Windows 8 support coming soon!" -ForegroundColor Yellow
     } elseif ($winVersion -eq "7") {
