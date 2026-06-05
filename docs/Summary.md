@@ -1,3 +1,327 @@
+# Windows Optimizer v1.0 — Full Project Summary
+
+> **Generated:** June 5, 2026
+>
+> **Git tag:** `v1.0`
+>
+> **Install:** `irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex`
+
+---
+
+## Table of Contents
+
+1. [Project Overview](#1-project-overview)
+2. [Repository Structure](#2-repository-structure)
+3. [Full Source Code](#3-full-source-code)
+   - [setup.ps1](#31-setupps1---entry-point)
+   - [library.ps1](#32-libraryps1---app-registry)
+   - [windows10-11/optimize.ps1](#33-windows10-11optimizeps1---gaming-branch)
+4. [Milestones & What Was Built](#4-milestones--what-was-built)
+5. [Errors Encountered & Fixes Applied](#5-errors-encountered--fixes-applied)
+6. [Key Decisions](#6-key-decisions)
+7. [Git History](#7-git-history)
+8. [Documentation](#8-documentation)
+   - [Product Requirements (PRD)](#81-product-requirements)
+   - [Milestones (talks.md)](#82-milestones)
+   - [Release Notes](#83-release-notes)
+
+---
+
+## 1. Project Overview
+
+Windows Optimizer is a **PowerShell-based Windows optimization tool** distributed via the `irm <url> | iex` one-liner pattern. It runs entirely inside the PowerShell terminal (no GUI), targets **Windows 10/11 Gaming profile**, and covers:
+
+- Privacy & telemetry hardening
+- UWP app debloating
+- Application installation via an interactive picker
+- Driver updates (Windows Update + runtimes)
+- System performance optimization
+
+### Constraints
+
+- All code is original — no copying from ChrisTitusTech, Windows 10 Debloater, or similar projects.
+- Runs entirely in PowerShell terminal — no GUI.
+- Single-keypress input via `[Console]::ReadKey($true)` — no Enter required for menus.
+- Colored output: Cyan (headers), Green (success), Yellow (warnings/placeholder), Red (errors), DarkGray (borders/notes).
+- Admin check via `WindowsPrincipal`, auto-elevation via `Start-Process -Verb RunAs`.
+- Temp file at `$env:TEMP\wo_session.tmp` with key=value plain text format.
+- GPU detection via `Get-WmiObject Win32_VideoController`.
+- ESC always returns to previous menu; every feature end screen shows `[R] Return to menu   [0] Exit`.
+
+---
+
+## 2. Repository Structure
+
+```
+windows-optimizer/
+├── setup.ps1                  # Entry point (184 lines)
+├── library.ps1                # App registry (40 lines)
+├── Summary.md                 # This file
+├── windows10-11/
+│   └── optimize.ps1           # Gaming branch, all 5 features (896 lines)
+└── docs/
+    ├── PRD.md                 # Product requirements (370 lines)
+    ├── talks.md               # Milestone definitions (149 lines)
+    └── RELEASE_NOTES.md       # v1.0 release notes (38 lines)
+```
+
+---
+
+## 3. Full Source Code
+
+### 3.1 `setup.ps1` — Entry Point
+
+**Path:** `/home/baqir/Projects/Windows-optimizer/setup.ps1`
+**Lines:** 184
+**Purpose:** Admin check, OS detection, dependency checks, temp file management, routing, cleanup.
+
+```powershell
+param(
+    [switch]$RepairSession
+)
+
+function Invoke-DependencyCheck {
+    param($winVersion)
+
+    # --- Dependency: winget ---
+    $wingetAvailable = $null -ne (Get-Command winget -ErrorAction SilentlyContinue)
+    if (-not $wingetAvailable) {
+        Write-Host "⚠ winget: not available, attempting install..." -ForegroundColor Yellow
+        try {
+            $appx = Get-AppxPackage -Name "*DesktopAppInstaller*" -ErrorAction SilentlyContinue | Sort-Object -Property Version -Descending | Select-Object -First 1
+            if (-not $appx) {
+                $appx = Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like "*DesktopAppInstaller*" } | Select-Object -First 1
+            }
+            if ($appx) {
+                Add-AppxPackage -Register "$($appx.InstallLocation)\AppxManifest.xml" -DisableDevelopmentMode -ErrorAction SilentlyContinue
+            }
+        } catch {
+            # winget registration failed, will be retried next session
+        }
+        $wingetAvailable = $null -ne (Get-Command winget -ErrorAction SilentlyContinue)
+        if ($wingetAvailable) {
+            Write-Host "✓ winget: installed" -ForegroundColor Green
+        } else {
+            Write-Host "⚠ winget: not available" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "✓ winget: available" -ForegroundColor Green
+    }
+
+    # --- Dependency: PSWindowsUpdate ---
+    $psWindowsUpdateAvailable = $null -ne (Get-Module -ListAvailable -Name PSWindowsUpdate -ErrorAction SilentlyContinue)
+    if (-not $psWindowsUpdateAvailable) {
+        Write-Host "⚠ PSWindowsUpdate: not available, attempting install..." -ForegroundColor Yellow
+        Install-Module -Name PSWindowsUpdate -Force -ErrorAction SilentlyContinue
+        $psWindowsUpdateAvailable = $null -ne (Get-Module -ListAvailable -Name PSWindowsUpdate -ErrorAction SilentlyContinue)
+        if ($psWindowsUpdateAvailable) {
+            Write-Host "✓ PSWindowsUpdate: installed" -ForegroundColor Green
+        } else {
+            Write-Host "⚠ PSWindowsUpdate: not available" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "✓ PSWindowsUpdate: available" -ForegroundColor Green
+    }
+
+    # --- Dependency: GPU Brand ---
+    $gpu = Get-WmiObject Win32_VideoController -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($gpu -and $gpu.Name -match "NVIDIA") {
+        $gpuBrand = "NVIDIA"
+        Write-Host "✓ GPU: NVIDIA" -ForegroundColor Green
+    } elseif ($gpu -and $gpu.Name -match "AMD|Radeon|ATI") {
+        $gpuBrand = "AMD"
+        Write-Host "✓ GPU: AMD" -ForegroundColor Green
+    } elseif ($gpu -and $gpu.Name -match "Intel") {
+        $gpuBrand = "INTEL"
+        Write-Host "✓ GPU: INTEL" -ForegroundColor Green
+    } else {
+        $gpuBrand = "UNKNOWN"
+        Write-Host "✓ GPU: UNKNOWN" -ForegroundColor Yellow
+    }
+
+    # --- Dependency: PowerShell Version ---
+    $psVersion = $PSVersionTable.PSVersion
+    if ($psVersion -lt [Version]"5.1") {
+        Write-Host "Warning: PowerShell $psVersion detected. Version 5.1 or higher recommended." -ForegroundColor Yellow
+    }
+
+    # --- Write to temp file ---
+    $tempContent = @"
+WIN_VERSION=$winVersion
+WINGET=$(if ($wingetAvailable) { "1" } else { "0" })
+GPU=$gpuBrand
+PSWindowsUpdate=$(if ($psWindowsUpdateAvailable) { "1" } else { "0" })
+"@
+    $tempContent | Set-Content -Path "$env:TEMP\wo_session.tmp" -Force
+
+    Write-Host ""
+}
+
+# --- Repair Session ---
+if ($RepairSession) {
+    # --- OS Detection ---
+    $osVersion = (Get-WmiObject Win32_OperatingSystem).Version
+    $versionParts = $osVersion -split '\.'
+    if ($versionParts.Length -ge 2) {
+        $major = [int]$versionParts[0]
+        $minor = [int]$versionParts[1]
+        $build = 0
+        if ($versionParts.Length -ge 3) {
+            $build = [int]$versionParts[2]
+        }
+
+        if ($major -eq 10 -and $minor -eq 0) {
+            if ($build -ge 22000) {
+                $winVersion = "11"
+            } else {
+                $winVersion = "10"
+            }
+        } elseif ($major -eq 6 -and $minor -eq 3) {
+            $winVersion = "8"
+        } elseif ($major -eq 6 -and $minor -eq 1) {
+            $winVersion = "7"
+        } else {
+            $winVersion = "Unknown"
+        }
+    } else {
+        $winVersion = "Unknown"
+    }
+
+    Invoke-DependencyCheck $winVersion
+    exit
+}
+
+# --- Admin Check ---
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = [Security.Principal.WindowsPrincipal]::new($identity)
+$isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if (-not $isAdmin) {
+    Write-Host "Elevating to Administrator..." -ForegroundColor Yellow
+    Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    exit
+}
+
+# --- Banner ---
+Write-Host "Windows Optimizer v1.0" -ForegroundColor Cyan
+Write-Host ""
+
+# --- OS Detection ---
+$osVersion = (Get-WmiObject Win32_OperatingSystem).Version
+$versionParts = $osVersion -split '\.'
+if ($versionParts.Length -ge 2) {
+    $major = [int]$versionParts[0]
+    $minor = [int]$versionParts[1]
+    $build = 0
+    if ($versionParts.Length -ge 3) {
+        $build = [int]$versionParts[2]
+    }
+
+    if ($major -eq 10 -and $minor -eq 0) {
+        if ($build -ge 22000) {
+            $winVersion = "11"
+        } else {
+            $winVersion = "10"
+        }
+    } elseif ($major -eq 6 -and $minor -eq 3) {
+        $winVersion = "8"
+    } elseif ($major -eq 6 -and $minor -eq 1) {
+        $winVersion = "7"
+    } else {
+        $winVersion = "Unknown"
+    }
+} else {
+    $winVersion = "Unknown"
+}
+
+Write-Host "Detected OS: Windows $winVersion (Version $osVersion)" -ForegroundColor Green
+Write-Host ""
+
+# --- Dependency Checks ---
+Invoke-DependencyCheck $winVersion
+
+# --- Scheduled Task (fallback cleanup) ---
+$taskName = "WO_Cleanup"
+$action = New-ScheduledTaskAction -Execute "powershell" -Argument "-NoProfile -Command `"Remove-Item '$env:TEMP\wo_session.tmp' -ErrorAction SilentlyContinue; Unregister-ScheduledTask -TaskName '$taskName' -Confirm:`$false -ErrorAction SilentlyContinue`""
+$trigger = New-ScheduledTaskTrigger -AtStartup
+Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -RunLevel Highest -Force | Out-Null
+
+# --- Routing ---
+try {
+    if ($winVersion -eq "10" -or $winVersion -eq "11") {
+        & (Join-Path $PSScriptRoot "windows10-11\optimize.ps1")
+    } elseif ($winVersion -eq "8") {
+        Write-Host "Windows 8 support coming soon!" -ForegroundColor Yellow
+    } elseif ($winVersion -eq "7") {
+        Write-Host "Windows 7 support coming soon!" -ForegroundColor Yellow
+    } else {
+        Write-Host "Unsupported operating system." -ForegroundColor Red
+    }
+} finally {
+    Remove-Item -Path "$env:TEMP\wo_session.tmp" -ErrorAction SilentlyContinue
+}
+```
+
+---
+
+### 3.2 `library.ps1` — App Registry
+
+**Path:** `/home/baqir/Projects/Windows-optimizer/library.ps1`
+**Lines:** 40
+**Purpose:** Single source of truth for all installable apps in the app installer picker.
+
+```powershell
+<#
+.SYNOPSIS
+    App registry / stub library for Windows Optimizer.
+
+.DESCRIPTION
+    This file is the single source of truth for all installable apps in the
+    Windows Optimizer tool. It is dot-sourced by optimize.ps1 (Feature 3,
+    Milestone 5) so that $AppLibrary is available in the caller's scope.
+
+    STRUCTURE
+    $AppLibrary is a hashtable whose keys are category names (strings) and
+    whose values are arrays of app-object hashtables.
+
+    APP-OBJECT SCHEMA
+    @{
+        Name = "Display Name"       # Human-readable name shown in the UI
+        ID   = "Publisher.PackageId"  # winget package identifier
+    }
+
+    HOW TO ADD A NEW APP
+    Add one line to the correct category array below.  No other file needs
+    to change — the app will automatically appear in the installer menu.
+#>
+
+$AppLibrary = @{
+    "Gaming" = @(
+        @{ Name = "Steam";       ID = "Valve.Steam" },
+        @{ Name = "Epic Games";  ID = "EpicGames.EpicGamesLauncher" }
+    )
+    "Browsers" = @(
+        @{ Name = "Firefox";     ID = "Mozilla.Firefox" },
+        @{ Name = "Zen Browser"; ID = "Zen-Team.Zen-Browser" },
+        @{ Name = "Chrome";      ID = "Google.Chrome" }
+    )
+    "Programming" = @(
+        @{ Name = "Python";          ID = "Python.Python.3" },
+        @{ Name = "Java (JDK)";      ID = "Oracle.JDK.21" },
+        @{ Name = "Visual Studio";   ID = "Microsoft.VisualStudio.2022.Community" }
+    )
+}
+```
+
+---
+
+### 3.3 `windows10-11/optimize.ps1` — Gaming Branch
+
+**Path:** `/home/baqir/Projects/Windows-optimizer/windows10-11/optimize.ps1`
+**Lines:** 896
+**Purpose:** Main menu with all 5 features for Windows 10/11 Gaming profile.
+
+```powershell
 <#
 .SYNOPSIS
     Windows Optimizer — Gaming PC Main Menu
@@ -104,19 +428,16 @@ function Invoke-DebloatWindows {
         "Microsoft.Wallet"
         "Microsoft.WindowsFeedbackHub"
         "Microsoft.WindowsMaps"
-        "Microsoft.YourPhone"
-        "Microsoft.ZuneMusic"
-        "Microsoft.ZuneVideo"
-        "Microsoft.MixedReality.Portal"
-    )
-
-    $xboxPackages = @(
         "Microsoft.Xbox.TCUI"
         "Microsoft.XboxApp"
         "Microsoft.XboxGameOverlay"
         "Microsoft.XboxGamingOverlay"
         "Microsoft.XboxIdentityProvider"
         "Microsoft.XboxSpeechToTextOverlay"
+        "Microsoft.YourPhone"
+        "Microsoft.ZuneMusic"
+        "Microsoft.ZuneVideo"
+        "Microsoft.MixedReality.Portal"
     )
 
     $removed = 0
@@ -134,61 +455,6 @@ function Invoke-DebloatWindows {
             }
         } catch {
             Write-Host "  ✗ Failed: $packageName" -ForegroundColor Red
-            $failed++
-        }
-    }
-
-    Write-Host ""
-    Write-Host "Do you want to remove Xbox components? [Y]es [N]o" -ForegroundColor Yellow
-    $key = [Console]::ReadKey($true).Key
-    if ($key -eq "Y") {
-        foreach ($packageName in $xboxPackages) {
-            try {
-                $appx = Get-AppxPackage -Name "$packageName*" -ErrorAction SilentlyContinue
-                if ($appx) {
-                    Remove-AppxPackage -Package $appx -ErrorAction Stop
-                    Write-Host "  ✓ Removed: $packageName" -ForegroundColor Green
-                    $removed++
-                } else {
-                    Write-Host "  - Not installed: $packageName" -ForegroundColor DarkGray
-                }
-            } catch {
-                Write-Host "  ✗ Failed: $packageName" -ForegroundColor Red
-                $failed++
-            }
-        }
-    }
-
-    Write-Host ""
-    Write-Host "Removing Microsoft Edge..." -ForegroundColor Yellow
-    $edgeResult = winget uninstall "Microsoft Edge" --silent 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "  ✓ Removed: Microsoft Edge" -ForegroundColor Green
-        $removed++
-    } else {
-        try {
-            Start-Process -FilePath "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe" -ArgumentList "--uninstall --system-level --force-uninstall" -Wait -NoNewWindow
-            Write-Host "  ✓ Removed: Microsoft Edge" -ForegroundColor Green
-            $removed++
-        } catch {
-            Write-Host "  ✗ Failed: Microsoft Edge" -ForegroundColor Red
-            $failed++
-        }
-    }
-
-    Write-Host ""
-    Write-Host "Removing Microsoft OneDrive..." -ForegroundColor Yellow
-    $onedriveResult = winget uninstall "Microsoft OneDrive" --silent 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "  ✓ Removed: Microsoft OneDrive" -ForegroundColor Green
-        $removed++
-    } else {
-        try {
-            Start-Process -FilePath "$env:SystemRoot\System32\OneDriveSetup.exe" -ArgumentList "/uninstall" -Wait -NoNewWindow
-            Write-Host "  ✓ Removed: Microsoft OneDrive" -ForegroundColor Green
-            $removed++
-        } catch {
-            Write-Host "  ✗ Failed: Microsoft OneDrive" -ForegroundColor Red
             $failed++
         }
     }
@@ -277,7 +543,7 @@ function Invoke-AppInstaller {
 
     # --- 4. Build ordered category list ---
     $categoryOrder = @()
-    foreach ($cat in @("System", "Gaming", "Browsers", "Communication", "Media & Documents", "System Monitoring", "Utilities", "Developer Tools")) {
+    foreach ($cat in @("System", "Gaming", "Browsers", "Programming")) {
         if ($AppLibrary.ContainsKey($cat) -and $AppLibrary[$cat].Count -gt 0) {
             $categoryOrder += $cat
         }
@@ -507,8 +773,8 @@ function Invoke-UpdateDrivers {
     Write-Host "=== Update Drivers ===" -ForegroundColor Cyan
     Write-Host ""
 
-    # --- Phase 1: Windows & Driver Updates ---
-    Write-Host "Phase 1 — Windows & Driver Updates" -ForegroundColor Cyan
+    # --- Phase 1: Windows Update Drivers ---
+    Write-Host "Phase 1 — Windows Update Drivers" -ForegroundColor Cyan
     Write-Host ""
 
     $tempFile = "$env:TEMP\wo_session.tmp"
@@ -524,35 +790,24 @@ function Invoke-UpdateDrivers {
     }
 
     if (-not $pswuEnabled) {
-        Write-Host "  ⚠ PSWindowsUpdate module not requested. Skipping Windows Update and driver updates." -ForegroundColor Yellow
+        Write-Host "  ⚠ PSWindowsUpdate module not requested. Skipping Windows Update drivers." -ForegroundColor Yellow
     } else {
         try {
             Import-Module PSWindowsUpdate -ErrorAction Stop
-
-            # Install all Windows updates (quality, security, etc.)
-            Write-Host "  Installing Windows updates..." -ForegroundColor DarkGray
-            $wuUpdates = Get-WindowsUpdate -MicrosoftUpdate -AcceptAll -Install -IgnoreReboot -ErrorAction Stop
-
-            # Install driver updates
-            Write-Host "  Installing driver updates..." -ForegroundColor DarkGray
-            $driverUpdates = Get-WindowsUpdate -UpdateType Driver -MicrosoftUpdate -AcceptAll -Install -IgnoreReboot -ErrorAction Stop
-
-            Write-Host "  ✓ Windows Update and driver check complete" -ForegroundColor Green
-
+            $updates = Get-WindowsUpdate -UpdateType Driver -MicrosoftUpdate -AcceptAll -Install -ErrorAction Stop
+            Write-Host "  ✓ Windows Update driver check complete" -ForegroundColor Green
             $needsReboot = $false
-            $allUpdates = @()
-            if ($wuUpdates) { $allUpdates += $wuUpdates }
-            if ($driverUpdates) { $allUpdates += $driverUpdates }
-            foreach ($u in $allUpdates) {
-                if ($u.RebootRequired) { $needsReboot = $true; break }
+            if ($updates) {
+                foreach ($u in $updates) {
+                    if ($u.RebootRequired) { $needsReboot = $true; break }
+                }
             }
-
             if ($needsReboot) {
-                Write-Host "  ⚠ A reboot is required to complete installation." -ForegroundColor Yellow
+                Write-Host "  ⚠ A reboot is required to complete driver installation." -ForegroundColor Yellow
                 Write-Host "    Please reboot your system at your convenience." -ForegroundColor DarkGray
             }
         } catch {
-            Write-Host "  ✗ Windows Update phase failed: $_" -ForegroundColor Red
+            Write-Host "  ✗ Windows Update driver phase failed: $_" -ForegroundColor Red
         }
     }
 
@@ -634,18 +889,10 @@ function Invoke-OptimizeSystem {
         "Refresh Rate — Set to maximum"
         "Mouse Acceleration — Disable"
         "Power Plan — Set to High Performance"
+        "Visual Effects — Performance mode"
         "Xbox Game Bar — Disable"
         "Startup Delay — Disable"
         "Hibernation — Disable"
-        "Sticky Keys — Disable"
-        "Activity History — Disable"
-        "Location Tracking — Disable"
-        "Widgets — Remove"
-        "Windows AI Features — Disable"
-        "Classic Context Menu — Enable"
-        "Bing Search — Disable in Start Menu"
-        "Ultimate Performance — Enable"
-        "Windows Sandbox — Enable"
     )
 
     Write-Host "The following changes will be applied:" -ForegroundColor DarkGray
@@ -664,15 +911,6 @@ function Invoke-OptimizeSystem {
 
     $succeeded = 0
     $failed = 0
-
-    # --- Create restore point ---
-    try {
-        Checkpoint-Computer -Description "Windows Optimizer - Before optimization" -RestorePointType MODIFY_SETTINGS -ErrorAction Stop
-        Write-Host "  ✓ System restore point created" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ! System restore point creation failed (service may be disabled): $_" -ForegroundColor Yellow
-    }
 
     Clear-Host
     Write-Host "=== Optimize System ===" -ForegroundColor Cyan
@@ -859,7 +1097,18 @@ public static class MouseHelper {
         $failed++
     }
 
-    # 5. Xbox Game Bar — Disable
+    # 5. Visual Effects — Performance mode
+    try {
+        $null = New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -Force -ErrorAction Stop
+        Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -Name "VisualFXSetting" -Value 2 -Type DWord -ErrorAction Stop
+        Write-Host "  ✓ $($changes[4])" -ForegroundColor Green
+        $succeeded++
+    } catch {
+        Write-Host "  ✗ $($changes[4])" -ForegroundColor Red
+        $failed++
+    }
+
+    # 6. Xbox Game Bar — Disable
     $gameBarOk = $true
     try {
         $null = New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR" -Force -ErrorAction Stop
@@ -874,28 +1123,17 @@ public static class MouseHelper {
         $gameBarOk = $false
     }
     if ($gameBarOk) {
-        Write-Host "  ✓ $($changes[4])" -ForegroundColor Green
-        $succeeded++
-    } else {
-        Write-Host "  ✗ $($changes[4])" -ForegroundColor Red
-        $failed++
-    }
-
-    # 6. Startup Delay — Disable
-    try {
-        $null = New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Serialize" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Serialize" -Name "StartupDelayInMSec" -Value 0 -Type DWord -ErrorAction Stop
         Write-Host "  ✓ $($changes[5])" -ForegroundColor Green
         $succeeded++
-    } catch {
+    } else {
         Write-Host "  ✗ $($changes[5])" -ForegroundColor Red
         $failed++
     }
 
-    # 7. Hibernation — Disable
+    # 7. Startup Delay — Disable
     try {
-        $null = powercfg /hibernate off 2>&1
-        if ($LASTEXITCODE -ne 0) { throw "powercfg failed" }
+        $null = New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Serialize" -Force -ErrorAction Stop
+        Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Serialize" -Name "StartupDelayInMSec" -Value 0 -Type DWord -ErrorAction Stop
         Write-Host "  ✓ $($changes[6])" -ForegroundColor Green
         $succeeded++
     } catch {
@@ -903,112 +1141,14 @@ public static class MouseHelper {
         $failed++
     }
 
-    # Disable Sticky Keys
+    # 8. Hibernation — Disable
     try {
-        $null = New-Item -Path "HKCU:\Control Panel\Accessibility\StickyKeys" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKCU:\Control Panel\Accessibility\StickyKeys" -Name "Flags" -Value "506" -ErrorAction Stop
+        $null = powercfg /hibernate off 2>&1
+        if ($LASTEXITCODE -ne 0) { throw "powercfg failed" }
         Write-Host "  ✓ $($changes[7])" -ForegroundColor Green
         $succeeded++
     } catch {
         Write-Host "  ✗ $($changes[7])" -ForegroundColor Red
-        $failed++
-    }
-
-    # Disable Activity History
-    try {
-        $null = New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 -Type DWord -ErrorAction Stop
-        Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Value 0 -Type DWord -ErrorAction Stop
-        Write-Host "  ✓ $($changes[8])" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ✗ $($changes[8])" -ForegroundColor Red
-        $failed++
-    }
-
-    # Disable Location Tracking
-    try {
-        $null = New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "Value" -Value "Deny" -ErrorAction Stop
-        Write-Host "  ✓ $($changes[9])" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ✗ $($changes[9])" -ForegroundColor Red
-        $failed++
-    }
-
-    # Remove Widgets
-    try {
-        # Hide widgets from taskbar
-        $null = New-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarDa" -Value 0 -Type DWord -ErrorAction Stop
-        # Unregister Widgets package
-        $widgetPkg = Get-AppxPackage -Name "*WebExperience*" -ErrorAction SilentlyContinue
-        if ($widgetPkg) {
-            Remove-AppxPackage -Package $widgetPkg -ErrorAction SilentlyContinue
-        }
-        Write-Host "  ✓ $($changes[10])" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ✗ $($changes[10])" -ForegroundColor Red
-        $failed++
-    }
-
-    # Disable Windows AI Features
-    try {
-        # Disable Copilot
-        $null = New-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowCopilotButton" -Value 0 -Type DWord -ErrorAction Stop
-        # Disable Copilot via policy
-        $null = New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot" -Name "TurnOffWindowsCopilot" -Value 1 -Type DWord -ErrorAction Stop
-        Write-Host "  ✓ $($changes[11])" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ✗ $($changes[11])" -ForegroundColor Red
-        $failed++
-    }
-
-    # Enable Classic Context Menu
-    try {
-        $null = New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Name "(default)" -Value "" -ErrorAction Stop
-        Write-Host "  ✓ $($changes[12])" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ✗ $($changes[12])" -ForegroundColor Red
-        $failed++
-    }
-
-    # Disable Bing Search in Start Menu
-    try {
-        $null = New-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Force -ErrorAction Stop
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Value 0 -Type DWord -ErrorAction Stop
-        Write-Host "  ✓ $($changes[13])" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ✗ $($changes[13])" -ForegroundColor Red
-        $failed++
-    }
-
-    # Enable Ultimate Performance Power Plan
-    try {
-        $null = powercfg /duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 2>&1
-        $null = powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61 2>&1
-        Write-Host "  ✓ $($changes[14])" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ✗ $($changes[14])" -ForegroundColor Red
-        $failed++
-    }
-
-    # Enable Windows Sandbox
-    try {
-        $null = Enable-WindowsOptionalFeature -FeatureName "Containers-DisposableClientVM" -Online -All -NoRestart -ErrorAction Stop
-        Write-Host "  ✓ $($changes[15])" -ForegroundColor Green
-        $succeeded++
-    } catch {
-        Write-Host "  ✗ $($changes[15])" -ForegroundColor Red
         $failed++
     }
 
@@ -1078,3 +1218,448 @@ try {
 finally {
     Write-Host "Cleanup complete." -ForegroundColor DarkGray
 }
+```
+
+---
+
+## 4. Milestones & What Was Built
+
+### Milestone 1 — Project Scaffold & Entry Point
+
+**Files:** `setup.ps1`, `windows10-11/optimize.ps1`, `library.ps1` (stubs)
+
+**What was built:**
+- Created directory structure (`windows10-11/`)
+- Implemented `setup.ps1`:
+  - Admin check with auto-elevation via `Start-Process powershell -Verb RunAs`
+  - OS version detection via `(Get-WmiObject Win32_OperatingSystem).Version`
+  - Routing logic (Windows 10/11 → gaming branch; Win8/Win7 → "Coming soon"; Unknown → "Unsupported")
+- Stubbed out `windows10-11/optimize.ps1` with a main menu skeleton
+- Stubbed out `library.ps1` with an empty `$AppLibrary` hashtable
+- Temp file creation at `$env:TEMP\wo_session.tmp` with initial key=value pairs
+- Registration of `WO_Cleanup` scheduled task (fallback cleanup on next boot)
+- Explicit temp file deletion on all exit paths via `try/finally`
+
+**Definition of Done:** Running `setup.ps1` as Admin detects the OS, routes to the gaming branch, shows the main menu, and cleans up the temp file on exit.
+
+---
+
+### Milestone 2 — Dependencies & Temp File
+
+**Files:** `setup.ps1`
+
+**What was built:**
+- Implemented `Invoke-DependencyCheck` function covering all four dependencies:
+  - **winget:** `Get-Command winget` → auto-install via `Get-AppxPackage` (user) → `Get-AppxProvisionedPackage` (system) fallback
+  - **PSWindowsUpdate:** `Get-Module -ListAvailable` → `Install-Module -Name PSWindowsUpdate -Force` if missing
+  - **GPU brand:** `Get-WmiObject Win32_VideoController` → NVIDIA/AMD/Intel/UNKNOWN
+  - **PowerShell version:** `$PSVersionTable.PSVersion` → warning if below 5.1
+- Writes results to `wo_session.tmp` (key=value format)
+- Temp file re-creation logic via `-RepairSession` parameter for mid-session recovery
+
+**Definition of Done:** All four dependencies are checked, auto-installed if possible, and results persisted in the temp file. Re-running the check recreates the file correctly.
+
+---
+
+### Milestone 3 — Feature 1: Privacy & Telemetry
+
+**Files:** `windows10-11/optimize.ps1` — `Invoke-PrivacyTelemetry`
+
+**What was built:**
+- 10 registry/policy changes applied:
+  1. `AllowTelemetry = 0` (HKLM DataCollection)
+  2. `EnableActivityFeed = 0` (HKLM System)
+  3. `PublishUserActivities = 0` (HKLM System)
+  4. `Enabled = 0` (HKCU AdvertisingInfo)
+  5. `DiagTrackAuthorization = 0` (HKLM Diagnostics)
+  6. `Value = Deny` (HKLM location)
+  7. `AllowCortana = 0` (HKLM Windows Search)
+  8. `AutoConnectAllowedOEM = 0` (HKLM Wi-Fi Sense)
+  9. `NumberOfSIUFInPeriod = 0` (HKCU feedback)
+  10. `GlobalUserDisabled = 1` (HKCU background apps)
+- 2 services stopped and disabled: `DiagTrack`, `dmwappushservice`
+- Line-by-line color-coded status (Green success, Red failure)
+- Summary at end with `[R]`/`[0]` end screen
+
+**Definition of Done:** Option [1] applies all telemetry hardening and displays a status summary.
+
+---
+
+### Milestone 4 — Feature 2: Debloat Windows
+
+**Files:** `windows10-11/optimize.ps1` — `Invoke-DebloatWindows`
+
+**What was built:**
+- Curated list of 24 UWP packages for removal:
+  `BingWeather`, `BingNews`, `BingFinance`, `BingSports`, `GetHelp`, `Getstarted`,
+  `MicrosoftSolitaireCollection`, `MicrosoftOfficeHub`, `OneConnect`, `People`,
+  `SkypeApp`, `Wallet`, `WindowsFeedbackHub`, `WindowsMaps`, `Xbox.TCUI`,
+  `XboxApp`, `XboxGameOverlay`, `XboxGamingOverlay`, `XboxIdentityProvider`,
+  `XboxSpeechToTextOverlay`, `YourPhone`, `ZuneMusic`, `ZuneVideo`,
+  `MixedReality.Portal`
+- Loop: `Get-AppxPackage` → `Remove-AppxPackage` per package
+- Silent error handling per package (log pass/fail)
+- End summary with `[R]`/`[0]` end screen
+
+**Definition of Done:** Option [2] removes targeted UWP apps and shows a final count.
+
+---
+
+### Milestone 5 — Feature 3: App Installer (Picker + Library)
+
+**Files:** `windows10-11/optimize.ps1` — `Invoke-AppInstaller`, `library.ps1`
+
+**What was built:**
+- **`library.ps1`** populated with 3 categories:
+  - **Gaming:** Steam, Epic Games (2 apps)
+  - **Browsers:** Firefox, Zen Browser, Chrome (3 apps)
+  - **Programming:** Python, Java (JDK), Visual Studio (3 apps)
+- **GPU app injection:** Reads temp file `GPU=` value; injects vendor app into a "System" category (ordered first):
+  - NVIDIA → NVIDIA App
+  - AMD → AMD Software: Adrenalin
+  - Intel → Intel Arc Control
+- **Interactive picker UI:**
+  - Category boxes rendered in 2-3 columns based on terminal width
+  - Toggle boxes with `[ ]`/`[x]` and color change (Cyan when selected)
+  - Arrow key navigation (left/right/up/down)
+  - Spacebar to toggle selection
+  - `I` key triggers install
+  - `ESC` returns to main menu
+- **Winget availability check** — early abort with message if missing
+- **Install loop:** `winget install --id ... --silent --accept-package-agreements --accept-source-agreements`
+- **Temp file repair:** If `wo_session.tmp` missing, calls `Invoke-DependencyCheck` to recreate
+- End screen with success/failure lists and `[R]`/`[0]`
+
+**Definition of Done:** Option [3] shows the picker, allows multi-select, installs chosen apps, and displays a summary.
+
+---
+
+### Milestone 6 — Feature 4: Update Drivers
+
+**Files:** `windows10-11/optimize.ps1` — `Invoke-UpdateDrivers`
+
+**What was built:**
+- **Phase 1 — Windows Update Drivers:**
+  - Checks temp file for `PSWindowsUpdate=1`
+  - Imports PSWindowsUpdate module
+  - Runs `Get-WindowsUpdate -UpdateType Driver -MicrosoftUpdate -AcceptAll -Install`
+  - Notifies if reboot is required (no auto-reboot)
+- **Phase 2 — All-in-One Runtimes (via winget):**
+  - Microsoft Visual C++ 2015-2022 x64
+  - Microsoft Visual C++ 2015-2022 x86
+  - Microsoft DirectX
+  - .NET Runtime 8.0
+  - .NET Desktop Runtime 8.0
+  - Microsoft XNA Framework Redist
+- Winget availability check (skips Phase 2 if missing)
+- Skip-and-log error model
+- End screen with `[R]`/`[0]`
+
+**Definition of Done:** Option [4] runs both driver updates and runtime installs, logging results for each.
+
+---
+
+### Milestone 7 — Feature 5: Optimize System
+
+**Files:** `windows10-11/optimize.ps1` — `Invoke-OptimizeSystem`
+
+**What was built:**
+- Confirmation prompt: `[Y] Apply all  [N] Cancel`
+- 8 performance/UX changes:
+  1. **Delivery Optimization P2P off** — registry `DODownloadMode = 0`
+  2. **Max refresh rate** — C# P/Invoke `DisplayChanger` with `EnumDisplaySettings`/`ChangeDisplaySettings`
+  3. **Mouse acceleration off** — registry (`MouseSpeed`, `MouseThreshold1/2`) + P/Invoke `SystemParametersInfo`
+  4. **High Performance power plan** — `powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c`
+  5. **Visual effects performance mode** — registry `VisualFXSetting = 2`
+  6. **Xbox Game Bar off** — HKCU + HKLM registry
+  7. **Startup delay off** — registry `StartupDelayInMSec = 0`
+  8. **Hibernation off** — `powercfg /hibernate off`
+- Line-by-line status (Yellow for non-critical failures like refresh rate)
+- Summary at end with `[R]`/`[0]`
+
+**Definition of Done:** Option [5] shows confirmation, applies all optimizations, and displays a summary.
+
+---
+
+### Milestone 8 — UX Polish & Error Handling Hardening
+
+**Files:** All files
+
+**What was fixed:**
+
+| Issue | Before | After |
+|---|---|---|
+| **ESC not handled** in end screens | Only checked `$key -eq "R"` | Added `-or $key -eq "Escape"` in all 5 features via `replaceAll` |
+| **Winget not checked** in Features 3 & 4 | Would silently fail on all installs | `Get-Command winget` check in Feature 3 (early abort) and Feature 4 Phase 2 (conditional wrapper) |
+| **Temp file missing mid-session** | Feature 3 and 4 would fail | Added `Invoke-DependencyCheck` call if `wo_session.tmp` not found |
+| **Features 1-2 missing `[R]/[0]` pattern** | Had no end screen | Added `do/while` end screen with `[R] Return to menu   [0] Exit` |
+| **`setup.ps1` relative path** | Hardcoded relative path | Changed to `Join-Path $PSScriptRoot "windows10-11\optimize.ps1"` |
+
+**Color scheme verified:**
+- ✅ Cyan for headers
+- ✅ Green for success
+- ✅ Yellow for warnings/placeholders
+- ✅ Red for errors
+- ✅ DarkGray for borders/notes/hints
+
+**`[Console]::ReadKey($true)`** verified on all menus (no Enter required).
+
+---
+
+### Milestone 9 — v1.0 Release
+
+**What was done:**
+- Created `docs/RELEASE_NOTES.md` with install command, feature summary, requirements
+- Initial git commit: `a9f6ab4 feat: v1.0 release - Windows Optimizer with all 5 features`
+- Release notes commit: `e0e47a8 docs: add v1.0 release notes`
+- Here-string fix commit: `dfce0c6 fix: here-string closing delimiter must be at column 0`
+- Tagged `v1.0`
+
+---
+
+## 5. Errors Encountered & Fixes Applied
+
+### Error 1: Here-string closing delimiter indentation
+
+**Reported by:** User (runtime parse error on Windows)
+
+**Error message:**
+```
+At E:\Windows-optimizer\setup.ps1:10 char:32
++     if (-not $wingetAvailable) {
++                                ~
+Missing closing '}' in statement block or type definition.
+At E:\Windows-optimizer\setup.ps1:5 char:33
++ function Invoke-DependencyCheck {
++                                 ~
+Missing closing '}' in statement block or type definition.
+```
+
+**Root cause:** In `setup.ps1`, the closing `"@` of the here-string was **indented with 4 spaces**. PowerShell requires the closing `"@` of a here-string to be at **column 0** (beginning of the line, no leading whitespace). Because it was indented, PowerShell never recognized the here-string as closed, treating the rest of the file as literal content and making all subsequent braces appear unmatched.
+
+**Fix:** Moved `"@` to column 0 and split the pipeline into two lines (assignment + separate pipe):
+
+```powershell
+# Before (broken):
+    @"
+...
+"@ | Set-Content ...          # "@ indented → PowerShell ignores it
+
+# After (fixed):
+    $tempContent = @"
+...
+"@                             # "@ at column 0 → properly terminates here-string
+    $tempContent | Set-Content ...
+```
+
+**Commit:** `dfce0c6 fix: here-string closing delimiter must be at column 0 in setup.ps1`
+
+**Verification:** `awk` brace counting confirmed balance = 0 for both `setup.ps1` and `optimize.ps1`.
+
+---
+
+### Error 2: Missing closing brace in Feature 4
+
+**Discovered during:** Milestone 8 audit
+
+**Root cause:** When adding `if ($wingetAvailable) { ... }` wrapper around the Phase 2 runtime loop in `Invoke-UpdateDrivers`, the closing `}` for the `if` block was not added after the `foreach` loop's closing `}`.
+
+**Fix:** Added the missing closing brace:
+
+```powershell
+    if ($wingetAvailable) {
+        foreach ($runtime in $runtimes) {
+            ...
+        }      # ← closes foreach (was present)
+    }          # ← closes if (was MISSING, now added)
+```
+
+---
+
+### Error 3: Features 1-2 end screens missing `[R]/[0]` pattern
+
+**Discovered during:** Early review
+
+**Root cause:** `Invoke-PrivacyTelemetry` and `Invoke-DebloatWindows` were initially implemented without any end screen — after showing the summary, they immediately returned to the menu.
+
+**Fix:** Added `do/while` loop with `[R] Return to menu   [0] Exit` prompt and `[Console]::ReadKey` handling, matching the pattern used in Features 3-5.
+
+---
+
+### Error 4: ESC not handled in end screens
+
+**Discovered during:** Milestone 8 audit
+
+**Root cause:** End screens only checked for `$key -eq "R"`, but the PRD specifies "ESC always returns to previous menu."
+
+**Fix:** Used `replaceAll` to add `-or $key -eq "Escape"` to all 5 end screens at once.
+
+---
+
+### Error 5: Winget availability unchecked in Features 3 and 4
+
+**Discovered during:** Milestone 8 audit
+
+**Root cause:** `Invoke-AppInstaller` and `Invoke-UpdateDrivers` would attempt `winget install` commands without first checking if winget was available, causing silent failures.
+
+**Fix:**
+- **Feature 3:** Added early abort with message before the picker:
+  ```powershell
+  if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+      Write-Host "⚠ winget is not available. Skipping app installation." -ForegroundColor Yellow
+      ...end screen with [R]/[0]...
+  }
+  ```
+- **Feature 4:** Wrapped Phase 2 winget loop in `if ($wingetAvailable) { ... }` with a warning message displayed before the conditional.
+
+---
+
+### Error 6: Temp file not found mid-session
+
+**Discovered during:** Milestone 8 audit
+
+**Root cause:** If the temp file `wo_session.tmp` was deleted mid-session, Features 3 and 4 would have no GPU or PSWindowsUpdate data.
+
+**Fix:** Both features now check for the temp file before reading it, and if missing, call `Invoke-DependencyCheck` inline to recreate it:
+```powershell
+if (-not (Test-Path $tempFile)) {
+    $null = Invoke-DependencyCheck (Get-WmiObject Win32_OperatingSystem).Version 2>&1
+}
+```
+
+---
+
+### Error 7: Relative path in `setup.ps1`
+
+**Discovered during:** Early review
+
+**Root cause:** `setup.ps1` used a hardcoded relative path `.\windows10-11\optimize.ps1` which fails when the script is run from a different working directory (e.g., run via `irm ... | iex`).
+
+**Fix:** Changed to `Join-Path $PSScriptRoot "windows10-11\optimize.ps1"` which resolves relative to the script's own location.
+
+---
+
+## 6. Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| **UWP debloat** uses `Get-AppxPackage` + `Remove-AppxPackage` (not provisioned package removal) | Per PRD spec — removes per-user packages, safer than provisioned removal |
+| **GPU brand** injected as "System" category, ordered first | Ensures GPU app always appears at the top for visibility |
+| **Picker renders** category boxes as columns from terminal width | Auto-adapts to any terminal size (2-3 columns) |
+| **Refresh rate** uses C# P/Invoke `EnumDisplaySettings`/`ChangeDisplaySettings` (not WMI) | More reliable across hardware configurations |
+| **Winget installation** uses two-path approach | `Get-AppxPackage` (user) → `Get-AppxProvisionedPackage` (system) fallback for broader compatibility |
+| **All end screens** share identical `do { ... } while ($true)` loop pattern | Consistency and maintainability |
+| **Here-string** content assigned to variable first, then piped | Prevents the indented `"@` problem and is cleaner for reading |
+| **Feature 5 non-critical failures** show Yellow instead of Red | Refresh rate failures (e.g., already at max) are informational, not errors |
+| **Invoke-DependencyCheck** centralized in `setup.ps1` with `-RepairSession` parameter | Reusable by Features 3 and 4 for mid-session temp file recovery |
+
+---
+
+## 7. Git History
+
+```
+dfce0c6 (HEAD -> master, tag: v1.0) fix: here-string closing delimiter must be at column 0 in setup.ps1
+e0e47a8 docs: add v1.0 release notes
+a9f6ab4 feat: v1.0 release - Windows Optimizer with all 5 features
+```
+
+### File Change Summary
+
+| File | Lines | Status |
+|---|---|---|
+| `setup.ps1` | 184 | Created (Milestone 1), fixed (Milestone 8, 9) |
+| `library.ps1` | 40 | Created (Milestone 1), populated (Milestone 5) |
+| `windows10-11/optimize.ps1` | 896 | Created (Milestone 1), all 5 features (Milestones 3-7), polished (Milestone 8) |
+| `docs/PRD.md` | 370 | Created (project start) |
+| `docs/talks.md` | 149 | Created (project start) |
+| `docs/RELEASE_NOTES.md` | 38 | Created (Milestone 9) |
+| `Summary.md` | This file | Created (final) |
+
+---
+
+## 8. Documentation
+
+### 8.1 Product Requirements
+
+The full PRD is in `docs/PRD.md` (370 lines). It covers:
+- Repository structure
+- Entry point (`setup.ps1`) responsibilities
+- Dependency check table
+- Temp file format and lifecycle
+- Routing logic
+- App registry schema (`library.ps1`)
+- All 5 feature specifications with detailed actions
+- UX conventions (colors, key handling, navigation)
+- Error handling table
+- Versioning plan (v1.0, v2.0, Future)
+- Out of scope items
+
+### 8.2 Milestones
+
+Defined in `docs/talks.md` (149 lines) — all 9 milestones with:
+- Files affected per milestone
+- Detailed implementation requirements
+- Definition of Done for each milestone
+
+### 8.3 Release Notes
+
+File: `docs/RELEASE_NOTES.md` (38 lines)
+
+```
+# Release Notes — Windows Optimizer v1.0
+Release date: May 26, 2026
+
+## Installation
+irm https://raw.githubusercontent.com/baqir/Windows-optimizer/main/setup.ps1 | iex
+
+## Features
+1. Privacy and Telemetry Hardening
+2. Debloat Windows (24 UWP packages)
+3. Install Apps (interactive picker + GPU injection)
+4. Update Drivers (PSWindowsUpdate + 6 runtimes)
+5. Optimize System (8 performance tweaks)
+
+## Requirements: Windows 10/11, Administrator
+```
+
+---
+
+## Appendix: Quick Reference
+
+### Menu Structure
+
+```
+[1] Privacy & Telemetry      → Invoke-PrivacyTelemetry     → 10 reg + 2 services
+[2] Debloat Windows          → Invoke-DebloatWindows       → 24 UWP packages
+[3] Install Apps             → Invoke-AppInstaller         → Interactive picker + winget
+[4] Update Drivers           → Invoke-UpdateDrivers        → PSWinUpdate + 6 runtimes
+[5] Optimize System          → Invoke-OptimizeSystem       → 8 performance tweaks
+[0] Exit                     → Cleanup + return
+```
+
+### Function Summary
+
+| Function | File | Lines | Purpose |
+|---|---|---|---|
+| `Invoke-DependencyCheck` | `setup.ps1` | 76 | Check/install winget, PSWindowsUpdate, GPU, PS version |
+| `Invoke-PrivacyTelemetry` | `optimize.ps1` | 77 | Apply 10 reg + 2 service changes |
+| `Invoke-DebloatWindows` | `optimize.ps1` | 70 | Remove 24 UWP packages |
+| `Invoke-AppInstaller` | `optimize.ps1` | 287 | Interactive picker + winget install |
+| `Invoke-UpdateDrivers` | `optimize.ps1` | 110 | PSWindowsUpdate + winget runtimes |
+| `Invoke-OptimizeSystem` | `optimize.ps1` | 293 | 8 optimization tweaks |
+| `Show-Menu` | `optimize.ps1` | 20 | Main menu rendering |
+| `Get-MaxRows` | `optimize.ps1` | 5 | Helper for picker layout |
+
+### File Line Counts
+
+| File | Lines |
+|---|---|
+| `setup.ps1` | 184 |
+| `library.ps1` | 40 |
+| `windows10-11/optimize.ps1` | 896 |
+| `docs/PRD.md` | 370 |
+| `docs/talks.md` | 149 |
+| `docs/RELEASE_NOTES.md` | 38 |
+| `Summary.md` | This file |
+| **Total (code)** | **1,120** |
+| **Total (all)** | **~1,677** |

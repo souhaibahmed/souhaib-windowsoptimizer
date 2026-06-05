@@ -23,18 +23,70 @@
 #>
 
 $AppLibrary = @{
-    "Gaming" = @(
-        @{ Name = "Steam";       ID = "Valve.Steam" },
-        @{ Name = "Epic Games";  ID = "EpicGames.EpicGamesLauncher" }
-    )
     "Browsers" = @(
-        @{ Name = "Firefox";     ID = "Mozilla.Firefox" },
-        @{ Name = "Zen Browser"; ID = "Zen-Team.Zen-Browser" },
-        @{ Name = "Chrome";      ID = "Google.Chrome" }
+        @{ Name = "Brave";          ID = "Brave.Brave" },
+        @{ Name = "Google Chrome";  ID = "Google.Chrome" },
+        @{ Name = "Chromium";       ID = "Hibbiki.Chromium" },
+        @{ Name = "Firefox";        ID = "Mozilla.Firefox" },
+        @{ Name = "Waterfox";       ID = "Waterfox.Waterfox" },
+        @{ Name = "Opera";          ID = "Opera.Opera" },
+        @{ Name = "Opera GX";       ID = "Opera.OperaGX" },
+        @{ Name = "Tor Browser";    ID = "TorProject.TorBrowser" },
+        @{ Name = "LibreWolf";      ID = "LibreWolf.LibreWolf" },
+        @{ Name = "Zen Browser";    ID = "Zen-Team.Zen-Browser" }
     )
-    "Programming" = @(
-        @{ Name = "Python";          ID = "Python.Python.3" },
-        @{ Name = "Java (JDK)";      ID = "Oracle.JDK.21" },
-        @{ Name = "Visual Studio";   ID = "Microsoft.VisualStudio.2022.Community" }
+    "Communication" = @(
+        @{ Name = "Discord";           ID = "Discord.Discord" },
+        @{ Name = "Vencord";           ID = "Vendicated.Vencord" },
+        @{ Name = "Microsoft Teams";   ID = "Microsoft.Teams" },
+        @{ Name = "Zoom";              ID = "Zoom.Zoom" },
+        @{ Name = "Telegram";          ID = "Telegram.TelegramDesktop" },
+        @{ Name = "WhatsApp";          ID = "WhatsApp.WhatsApp" }
+    )
+    "Media & Documents" = @(
+        @{ Name = "VLC";                    ID = "VideoLAN.VLC" },
+        @{ Name = "K-Lite Codec Pack Full"; ID = "CodecGuide.K-LiteCodecPack.Full" },
+        @{ Name = "Audacity";               ID = "Audacity.Audacity" },
+        @{ Name = "Spotify";                ID = "Spotify.Spotify" },
+        @{ Name = "OBS Studio";             ID = "OBSProject.OBSStudio" },
+        @{ Name = "Adobe Acrobat Reader";   ID = "Adobe.Acrobat.Reader.64-bit" }
+    )
+    "Gaming" = @(
+        @{ Name = "Steam";                  ID = "Valve.Steam" },
+        @{ Name = "Epic Games";             ID = "EpicGames.EpicGamesLauncher" },
+        @{ Name = "GOG Galaxy";             ID = "GOG.Galaxy" },
+        @{ Name = "EA App";                 ID = "ElectronicArts.EADesktop" },
+        @{ Name = "Ubisoft Connect";        ID = "Ubisoft.Connect" },
+        @{ Name = "Minecraft Launcher";     ID = "Mojang.MinecraftLauncher" },
+        @{ Name = "Playnite";               ID = "Playnite.Playnite" },
+        @{ Name = "PPSSPP";                 ID = "PPSSPPTeam.PPSSPP" }
+    )
+    "System Monitoring" = @(
+        @{ Name = "MSI Afterburner";    ID = "Guru3D.Afterburner" },
+        @{ Name = "HWiNFO";             ID = "REALiX.HWiNFO" },
+        @{ Name = "CPU-Z";              ID = "CPUID.CPU-Z" },
+        @{ Name = "GPU-Z";              ID = "TechPowerUp.GPU-Z" },
+        @{ Name = "CrystalDiskInfo";    ID = "CrystalDewWorld.CrystalDiskInfo" }
+    )
+    "Utilities" = @(
+        @{ Name = "AnyDesk";                    ID = "AnyDesk.AnyDesk" },
+        @{ Name = "TeamViewer";                 ID = "TeamViewer.TeamViewer" },
+        @{ Name = "Revo Uninstaller";           ID = "RevoUninstaller.RevoUninstaller" },
+        @{ Name = "Everything";                 ID = "voidtools.Everything" },
+        @{ Name = "WinRAR";                     ID = "RARLab.WinRAR" },
+        @{ Name = "7-Zip";                      ID = "7zip.7zip" },
+        @{ Name = "PeaZip";                     ID = "PeaZip.PeaZip" },
+        @{ Name = "PowerToys";                  ID = "Microsoft.PowerToys" },
+        @{ Name = "ShareX";                     ID = "ShareX.ShareX" },
+        @{ Name = "LocalSend";                  ID = "LocalSend.LocalSend" },
+        @{ Name = "Internet Download Manager";  ID = "Tonec.InternetDownloadManager" },
+        @{ Name = "Neat Download Manager";      ID = "JavadMotallebi.NeatDownloadManager" },
+        @{ Name = "Free Download Manager";      ID = "SoftDeluxe.FreeDownloadManager" }
+    )
+    "Developer Tools" = @(
+        @{ Name = "Python 3";           ID = "Python.Python.3" },
+        @{ Name = "Git";                ID = "Git.Git" },
+        @{ Name = "Notepad++";          ID = "Notepad++.Notepad++" },
+        @{ Name = "Visual Studio Code"; ID = "Microsoft.VisualStudioCode" }
     )
 }

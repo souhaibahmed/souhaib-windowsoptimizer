@@ -1,0 +1,702 @@
+{
+  ".claude/settings.json": {
+    "mtime": 1780667641.2357192,
+    "ast_hash": "bfee062c3962c14264fd704e975a6b38",
+    "semantic_hash": "bfee062c3962c14264fd704e975a6b38"
+  },
+  ".opencode/opencode.json": {
+    "mtime": 1780667670.6991553,
+    "ast_hash": "e5f74d14a81702b55bdf53b33ec991d7",
+    "semantic_hash": "e5f74d14a81702b55bdf53b33ec991d7"
+  },
+  ".opencode/package.json": {
+    "mtime": 1780667735.5494978,
+    "ast_hash": "d3ab821609ec487b22aa5b0027f5f400",
+    "semantic_hash": "d3ab821609ec487b22aa5b0027f5f400"
+  },
+  ".opencode/plugins/graphify.js": {
+    "mtime": 1780667764.385277,
+    "ast_hash": "64ccd3c03dbfe0980b6095766f5c4e52",
+    "semantic_hash": "64ccd3c03dbfe0980b6095766f5c4e52"
+  },
+  "library.ps1": {
+    "mtime": 1780669274.7719657,
+    "ast_hash": "9de17c00292017599bd314ca794065e4",
+    "semantic_hash": ""
+  },
+  "setup.ps1": {
+    "mtime": 1780662071.218572,
+    "ast_hash": "ecca3a2fd9318451dbf4476e1c354cb9",
+    "semantic_hash": "ecca3a2fd9318451dbf4476e1c354cb9"
+  },
+  "skills-lock.json": {
+    "mtime": 1779834309.0015929,
+    "ast_hash": "42e590ca11a64368ddfaca214e3ac982",
+    "semantic_hash": "42e590ca11a64368ddfaca214e3ac982"
+  },
+  "windows10-11/optimize.ps1": {
+    "mtime": 1780669281.0290194,
+    "ast_hash": "94ddb3ee7c1db2f16ee483d4ee6563ee",
+    "semantic_hash": ""
+  },
+  ".agents/skills/claude-api/LICENSE.txt": {
+    "mtime": 1779834308.9955928,
+    "ast_hash": "0ee6429f4c66920b6744d818225fb58f",
+    "semantic_hash": "0ee6429f4c66920b6744d818225fb58f"
+  },
+  ".agents/skills/claude-api/SKILL.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "82e00009259d9c4971686e4f4baad471",
+    "semantic_hash": "82e00009259d9c4971686e4f4baad471"
+  },
+  ".agents/skills/claude-api/csharp/claude-api.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "fcc7b57e00dbd6b9519ce66ced361c04",
+    "semantic_hash": "fcc7b57e00dbd6b9519ce66ced361c04"
+  },
+  ".agents/skills/claude-api/curl/examples.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "31c47fcd8180a9c00bd3837efe59a116",
+    "semantic_hash": "31c47fcd8180a9c00bd3837efe59a116"
+  },
+  ".agents/skills/claude-api/curl/managed-agents.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "f55abfba9addc05803f98df03c4e0e92",
+    "semantic_hash": "f55abfba9addc05803f98df03c4e0e92"
+  },
+  ".agents/skills/claude-api/go/claude-api.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "c90c034f9dc5bf238bd415a1f5cdcf1b",
+    "semantic_hash": "c90c034f9dc5bf238bd415a1f5cdcf1b"
+  },
+  ".agents/skills/claude-api/go/managed-agents/README.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "8a49f1487082366bba83b540d9d1b778",
+    "semantic_hash": "8a49f1487082366bba83b540d9d1b778"
+  },
+  ".agents/skills/claude-api/java/claude-api.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "4cb5360cf52c34d6ed3df1c12afb788a",
+    "semantic_hash": "4cb5360cf52c34d6ed3df1c12afb788a"
+  },
+  ".agents/skills/claude-api/java/managed-agents/README.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "b589edbb114da882d7a43893fc7dad24",
+    "semantic_hash": "b589edbb114da882d7a43893fc7dad24"
+  },
+  ".agents/skills/claude-api/php/claude-api.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "8a2ead4f2086899116439438104f57b4",
+    "semantic_hash": "8a2ead4f2086899116439438104f57b4"
+  },
+  ".agents/skills/claude-api/php/managed-agents/README.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "7bbf782f32dfc0d04d6a5671cb06f386",
+    "semantic_hash": "7bbf782f32dfc0d04d6a5671cb06f386"
+  },
+  ".agents/skills/claude-api/python/claude-api/README.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "7d6108dbcff86c0fbb7910a555918bea",
+    "semantic_hash": "7d6108dbcff86c0fbb7910a555918bea"
+  },
+  ".agents/skills/claude-api/python/claude-api/batches.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "f1a3f6c1a26421f9a4e7a73a87e53b28",
+    "semantic_hash": "f1a3f6c1a26421f9a4e7a73a87e53b28"
+  },
+  ".agents/skills/claude-api/python/claude-api/files-api.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "115ba6e45af3fd47e2c71ed3e8e01eb5",
+    "semantic_hash": "115ba6e45af3fd47e2c71ed3e8e01eb5"
+  },
+  ".agents/skills/claude-api/python/claude-api/streaming.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "7abb02b94365e177c0490f52fcec1edb",
+    "semantic_hash": "7abb02b94365e177c0490f52fcec1edb"
+  },
+  ".agents/skills/claude-api/python/claude-api/tool-use.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "555b6e6fe0d66e1ad67f650378899cdf",
+    "semantic_hash": "555b6e6fe0d66e1ad67f650378899cdf"
+  },
+  ".agents/skills/claude-api/python/managed-agents/README.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "b910a86418a73c8797987e50046eb8bf",
+    "semantic_hash": "b910a86418a73c8797987e50046eb8bf"
+  },
+  ".agents/skills/claude-api/ruby/claude-api.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "4ee7a49c1ef45d1a8b44f0786f371f85",
+    "semantic_hash": "4ee7a49c1ef45d1a8b44f0786f371f85"
+  },
+  ".agents/skills/claude-api/ruby/managed-agents/README.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "c83bdc325b4b8a0da0df9497e151022f",
+    "semantic_hash": "c83bdc325b4b8a0da0df9497e151022f"
+  },
+  ".agents/skills/claude-api/shared/agent-design.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "4d8b20e2d6389f6cdfd943cb45c51cf0",
+    "semantic_hash": "4d8b20e2d6389f6cdfd943cb45c51cf0"
+  },
+  ".agents/skills/claude-api/shared/error-codes.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "2cb05689bcdd79652f4f621d8cf8467a",
+    "semantic_hash": "2cb05689bcdd79652f4f621d8cf8467a"
+  },
+  ".agents/skills/claude-api/shared/live-sources.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "4a1348e429a152ac1e95e93e607d338b",
+    "semantic_hash": "4a1348e429a152ac1e95e93e607d338b"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-api-reference.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "fb54171978b01cf9d9426017d5754ced",
+    "semantic_hash": "fb54171978b01cf9d9426017d5754ced"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-client-patterns.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "7ee3a4fa4c751dfa8a766c811fee5255",
+    "semantic_hash": "7ee3a4fa4c751dfa8a766c811fee5255"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-core.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "ee950e9cb78fb5f9122a5d17a1406992",
+    "semantic_hash": "ee950e9cb78fb5f9122a5d17a1406992"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-environments.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "00cd23e63a581a6a1935a519b1c36fba",
+    "semantic_hash": "00cd23e63a581a6a1935a519b1c36fba"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-events.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "7cdd1c603a599163752ca913da89fb49",
+    "semantic_hash": "7cdd1c603a599163752ca913da89fb49"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-memory.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "6cdfc44551b7ceb9c10683135be4b25f",
+    "semantic_hash": "6cdfc44551b7ceb9c10683135be4b25f"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-multiagent.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "c2221225ca3356bd654a114e59f2713a",
+    "semantic_hash": "c2221225ca3356bd654a114e59f2713a"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-onboarding.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "c593ca52ede2cf3b872c328a7101e365",
+    "semantic_hash": "c593ca52ede2cf3b872c328a7101e365"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-outcomes.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "4e27bfb48ff693e796dbbf71ae48c82b",
+    "semantic_hash": "4e27bfb48ff693e796dbbf71ae48c82b"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-overview.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "851d1d6cfd092028b533b99937fde459",
+    "semantic_hash": "851d1d6cfd092028b533b99937fde459"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-self-hosted-sandboxes.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "b99a44ea4ff656c8c62b87720af7997e",
+    "semantic_hash": "b99a44ea4ff656c8c62b87720af7997e"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-tools.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "79b8269b2f704210faa6597795e7d232",
+    "semantic_hash": "79b8269b2f704210faa6597795e7d232"
+  },
+  ".agents/skills/claude-api/shared/managed-agents-webhooks.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "2ab9f341ffc128b8df82bdd26c42339d",
+    "semantic_hash": "2ab9f341ffc128b8df82bdd26c42339d"
+  },
+  ".agents/skills/claude-api/shared/model-migration.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "877b0d1cee40f131ddca6d9902a20a4c",
+    "semantic_hash": "877b0d1cee40f131ddca6d9902a20a4c"
+  },
+  ".agents/skills/claude-api/shared/models.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "d6d374732657b577fefc7eb72ea8dc97",
+    "semantic_hash": "d6d374732657b577fefc7eb72ea8dc97"
+  },
+  ".agents/skills/claude-api/shared/prompt-caching.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "785e38f32032ff64d7ee21a6f6788edf",
+    "semantic_hash": "785e38f32032ff64d7ee21a6f6788edf"
+  },
+  ".agents/skills/claude-api/shared/tool-use-concepts.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "b08808fab062e20b7776437527316965",
+    "semantic_hash": "b08808fab062e20b7776437527316965"
+  },
+  ".agents/skills/claude-api/typescript/claude-api/README.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "e8efbf5f2da2d08a26c488a94a75f19c",
+    "semantic_hash": "e8efbf5f2da2d08a26c488a94a75f19c"
+  },
+  ".agents/skills/claude-api/typescript/claude-api/batches.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "6a46f62baa00af23d1915c708024e393",
+    "semantic_hash": "6a46f62baa00af23d1915c708024e393"
+  },
+  ".agents/skills/claude-api/typescript/claude-api/files-api.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "795b64b84c501c747f8f59d3bbf86d70",
+    "semantic_hash": "795b64b84c501c747f8f59d3bbf86d70"
+  },
+  ".agents/skills/claude-api/typescript/claude-api/streaming.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "d5e5d3685dc9bd3b9742fcb59b79555d",
+    "semantic_hash": "d5e5d3685dc9bd3b9742fcb59b79555d"
+  },
+  ".agents/skills/claude-api/typescript/claude-api/tool-use.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "2b644fa6996a3ae2d108d6969249c0a3",
+    "semantic_hash": "2b644fa6996a3ae2d108d6969249c0a3"
+  },
+  ".agents/skills/claude-api/typescript/managed-agents/README.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "02d566e731ccad57c5b4f7a7c7acddeb",
+    "semantic_hash": "02d566e731ccad57c5b4f7a7c7acddeb"
+  },
+  ".agents/skills/everything-claude-code-conventions/SKILL.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "965fbd50b34c27d73ef72fd409be5eb0",
+    "semantic_hash": "965fbd50b34c27d73ef72fd409be5eb0"
+  },
+  ".claude/CLAUDE.md": {
+    "mtime": 1780667641.235287,
+    "ast_hash": "db73b0edd7ffbc61ceac177130730865",
+    "semantic_hash": "db73b0edd7ffbc61ceac177130730865"
+  },
+  ".claude/skills/graphify/SKILL.md": {
+    "mtime": 1780667641.2350626,
+    "ast_hash": "1acfc5e3ff91c92373909c5c11f55769",
+    "semantic_hash": "1acfc5e3ff91c92373909c5c11f55769"
+  },
+  ".claude/skills/graphify/references/add-watch.md": {
+    "mtime": 1780665474.5037284,
+    "ast_hash": "0df0589623217ca38a12bdcabfb42f4c",
+    "semantic_hash": "0df0589623217ca38a12bdcabfb42f4c"
+  },
+  ".claude/skills/graphify/references/exports.md": {
+    "mtime": 1780665474.5047283,
+    "ast_hash": "7fb1a81aca17a462db70684a324fcfb0",
+    "semantic_hash": "7fb1a81aca17a462db70684a324fcfb0"
+  },
+  ".claude/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1780665474.5047283,
+    "ast_hash": "24808b03abfeaf5f6435bb69c0125b2c",
+    "semantic_hash": "24808b03abfeaf5f6435bb69c0125b2c"
+  },
+  ".claude/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1780665474.5047283,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": "cde13df085e4c492aeb7ba298a996d0d"
+  },
+  ".claude/skills/graphify/references/hooks.md": {
+    "mtime": 1780665474.5057282,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": "3f545db6ce646650bb9de588f5512a27"
+  },
+  ".claude/skills/graphify/references/query.md": {
+    "mtime": 1780665474.5057282,
+    "ast_hash": "8b40ed8c9e9060fc215219a8fc964091",
+    "semantic_hash": "8b40ed8c9e9060fc215219a8fc964091"
+  },
+  ".claude/skills/graphify/references/transcribe.md": {
+    "mtime": 1780665474.5057282,
+    "ast_hash": "70f6aa30d6211f3a2c7e9fc45479f50c",
+    "semantic_hash": "70f6aa30d6211f3a2c7e9fc45479f50c"
+  },
+  ".claude/skills/graphify/references/update.md": {
+    "mtime": 1780665475.3167312,
+    "ast_hash": "735932eaa4f0c8fef9566c538ae3e5f8",
+    "semantic_hash": "735932eaa4f0c8fef9566c538ae3e5f8"
+  },
+  "CLAUDE.md": {
+    "mtime": 1780667641.2355618,
+    "ast_hash": "82efb97a359f5c7290bf2513d14686be",
+    "semantic_hash": "82efb97a359f5c7290bf2513d14686be"
+  },
+  "docs/PRD.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "3b92102558f80ec50f9f2f31d123225a",
+    "semantic_hash": "3b92102558f80ec50f9f2f31d123225a"
+  },
+  "docs/RELEASE_NOTES.md": {
+    "mtime": 1779835253.3446841,
+    "ast_hash": "f7383227fdcf52b30d255eeb72f3d09d",
+    "semantic_hash": "f7383227fdcf52b30d255eeb72f3d09d"
+  },
+  "docs/talks.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "5380450bbe4fdaa73cb8b4ab19c0a4f5",
+    "semantic_hash": "5380450bbe4fdaa73cb8b4ab19c0a4f5"
+  },
+  "docs/Summary.md": {
+    "mtime": 1780662327.4861882,
+    "ast_hash": "3953bd65996f8e1796a4eae6d64bba91",
+    "semantic_hash": ""
+  },
+  "docs/library.txt": {
+    "mtime": 1780668592.212274,
+    "ast_hash": "e6d9108b5382dfcfc5974307ada89294",
+    "semantic_hash": ""
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/settings.json": {
+    "mtime": 1780667641.2357192,
+    "ast_hash": "bfee062c3962c14264fd704e975a6b38",
+    "semantic_hash": "bfee062c3962c14264fd704e975a6b38"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.opencode/opencode.json": {
+    "mtime": 1780667670.6991553,
+    "ast_hash": "e5f74d14a81702b55bdf53b33ec991d7",
+    "semantic_hash": "e5f74d14a81702b55bdf53b33ec991d7"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.opencode/package.json": {
+    "mtime": 1780667735.5494978,
+    "ast_hash": "d3ab821609ec487b22aa5b0027f5f400",
+    "semantic_hash": "d3ab821609ec487b22aa5b0027f5f400"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.opencode/plugins/graphify.js": {
+    "mtime": 1780667764.385277,
+    "ast_hash": "64ccd3c03dbfe0980b6095766f5c4e52",
+    "semantic_hash": "64ccd3c03dbfe0980b6095766f5c4e52"
+  },
+  "/home/baqir/Projects/Windows-optimizer/library.ps1": {
+    "mtime": 1780669274.7719657,
+    "ast_hash": "9de17c00292017599bd314ca794065e4",
+    "semantic_hash": "9de17c00292017599bd314ca794065e4"
+  },
+  "/home/baqir/Projects/Windows-optimizer/setup.ps1": {
+    "mtime": 1780662071.218572,
+    "ast_hash": "ecca3a2fd9318451dbf4476e1c354cb9",
+    "semantic_hash": "ecca3a2fd9318451dbf4476e1c354cb9"
+  },
+  "/home/baqir/Projects/Windows-optimizer/skills-lock.json": {
+    "mtime": 1779834309.0015929,
+    "ast_hash": "42e590ca11a64368ddfaca214e3ac982",
+    "semantic_hash": "42e590ca11a64368ddfaca214e3ac982"
+  },
+  "/home/baqir/Projects/Windows-optimizer/windows10-11/optimize.ps1": {
+    "mtime": 1780669281.0290194,
+    "ast_hash": "94ddb3ee7c1db2f16ee483d4ee6563ee",
+    "semantic_hash": "94ddb3ee7c1db2f16ee483d4ee6563ee"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/LICENSE.txt": {
+    "mtime": 1779834308.9955928,
+    "ast_hash": "0ee6429f4c66920b6744d818225fb58f",
+    "semantic_hash": "0ee6429f4c66920b6744d818225fb58f"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/SKILL.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "82e00009259d9c4971686e4f4baad471",
+    "semantic_hash": "82e00009259d9c4971686e4f4baad471"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/csharp/claude-api.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "fcc7b57e00dbd6b9519ce66ced361c04",
+    "semantic_hash": "fcc7b57e00dbd6b9519ce66ced361c04"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/curl/examples.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "31c47fcd8180a9c00bd3837efe59a116",
+    "semantic_hash": "31c47fcd8180a9c00bd3837efe59a116"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/curl/managed-agents.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "f55abfba9addc05803f98df03c4e0e92",
+    "semantic_hash": "f55abfba9addc05803f98df03c4e0e92"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/go/claude-api.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "c90c034f9dc5bf238bd415a1f5cdcf1b",
+    "semantic_hash": "c90c034f9dc5bf238bd415a1f5cdcf1b"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/go/managed-agents/README.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "8a49f1487082366bba83b540d9d1b778",
+    "semantic_hash": "8a49f1487082366bba83b540d9d1b778"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/java/claude-api.md": {
+    "mtime": 1779834308.996593,
+    "ast_hash": "4cb5360cf52c34d6ed3df1c12afb788a",
+    "semantic_hash": "4cb5360cf52c34d6ed3df1c12afb788a"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/java/managed-agents/README.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "b589edbb114da882d7a43893fc7dad24",
+    "semantic_hash": "b589edbb114da882d7a43893fc7dad24"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/php/claude-api.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "8a2ead4f2086899116439438104f57b4",
+    "semantic_hash": "8a2ead4f2086899116439438104f57b4"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/php/managed-agents/README.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "7bbf782f32dfc0d04d6a5671cb06f386",
+    "semantic_hash": "7bbf782f32dfc0d04d6a5671cb06f386"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/python/claude-api/README.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "7d6108dbcff86c0fbb7910a555918bea",
+    "semantic_hash": "7d6108dbcff86c0fbb7910a555918bea"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/python/claude-api/batches.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "f1a3f6c1a26421f9a4e7a73a87e53b28",
+    "semantic_hash": "f1a3f6c1a26421f9a4e7a73a87e53b28"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/python/claude-api/files-api.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "115ba6e45af3fd47e2c71ed3e8e01eb5",
+    "semantic_hash": "115ba6e45af3fd47e2c71ed3e8e01eb5"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/python/claude-api/streaming.md": {
+    "mtime": 1779834308.997593,
+    "ast_hash": "7abb02b94365e177c0490f52fcec1edb",
+    "semantic_hash": "7abb02b94365e177c0490f52fcec1edb"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/python/claude-api/tool-use.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "555b6e6fe0d66e1ad67f650378899cdf",
+    "semantic_hash": "555b6e6fe0d66e1ad67f650378899cdf"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/python/managed-agents/README.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "b910a86418a73c8797987e50046eb8bf",
+    "semantic_hash": "b910a86418a73c8797987e50046eb8bf"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/ruby/claude-api.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "4ee7a49c1ef45d1a8b44f0786f371f85",
+    "semantic_hash": "4ee7a49c1ef45d1a8b44f0786f371f85"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/ruby/managed-agents/README.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "c83bdc325b4b8a0da0df9497e151022f",
+    "semantic_hash": "c83bdc325b4b8a0da0df9497e151022f"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/agent-design.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "4d8b20e2d6389f6cdfd943cb45c51cf0",
+    "semantic_hash": "4d8b20e2d6389f6cdfd943cb45c51cf0"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/error-codes.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "2cb05689bcdd79652f4f621d8cf8467a",
+    "semantic_hash": "2cb05689bcdd79652f4f621d8cf8467a"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/live-sources.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "4a1348e429a152ac1e95e93e607d338b",
+    "semantic_hash": "4a1348e429a152ac1e95e93e607d338b"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-api-reference.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "fb54171978b01cf9d9426017d5754ced",
+    "semantic_hash": "fb54171978b01cf9d9426017d5754ced"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-client-patterns.md": {
+    "mtime": 1779834308.9985929,
+    "ast_hash": "7ee3a4fa4c751dfa8a766c811fee5255",
+    "semantic_hash": "7ee3a4fa4c751dfa8a766c811fee5255"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-core.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "ee950e9cb78fb5f9122a5d17a1406992",
+    "semantic_hash": "ee950e9cb78fb5f9122a5d17a1406992"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-environments.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "00cd23e63a581a6a1935a519b1c36fba",
+    "semantic_hash": "00cd23e63a581a6a1935a519b1c36fba"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-events.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "7cdd1c603a599163752ca913da89fb49",
+    "semantic_hash": "7cdd1c603a599163752ca913da89fb49"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-memory.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "6cdfc44551b7ceb9c10683135be4b25f",
+    "semantic_hash": "6cdfc44551b7ceb9c10683135be4b25f"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-multiagent.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "c2221225ca3356bd654a114e59f2713a",
+    "semantic_hash": "c2221225ca3356bd654a114e59f2713a"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-onboarding.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "c593ca52ede2cf3b872c328a7101e365",
+    "semantic_hash": "c593ca52ede2cf3b872c328a7101e365"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-outcomes.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "4e27bfb48ff693e796dbbf71ae48c82b",
+    "semantic_hash": "4e27bfb48ff693e796dbbf71ae48c82b"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-overview.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "851d1d6cfd092028b533b99937fde459",
+    "semantic_hash": "851d1d6cfd092028b533b99937fde459"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-self-hosted-sandboxes.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "b99a44ea4ff656c8c62b87720af7997e",
+    "semantic_hash": "b99a44ea4ff656c8c62b87720af7997e"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-tools.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "79b8269b2f704210faa6597795e7d232",
+    "semantic_hash": "79b8269b2f704210faa6597795e7d232"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/managed-agents-webhooks.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "2ab9f341ffc128b8df82bdd26c42339d",
+    "semantic_hash": "2ab9f341ffc128b8df82bdd26c42339d"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/model-migration.md": {
+    "mtime": 1779834308.999593,
+    "ast_hash": "877b0d1cee40f131ddca6d9902a20a4c",
+    "semantic_hash": "877b0d1cee40f131ddca6d9902a20a4c"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/models.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "d6d374732657b577fefc7eb72ea8dc97",
+    "semantic_hash": "d6d374732657b577fefc7eb72ea8dc97"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/prompt-caching.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "785e38f32032ff64d7ee21a6f6788edf",
+    "semantic_hash": "785e38f32032ff64d7ee21a6f6788edf"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/shared/tool-use-concepts.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "b08808fab062e20b7776437527316965",
+    "semantic_hash": "b08808fab062e20b7776437527316965"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/typescript/claude-api/README.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "e8efbf5f2da2d08a26c488a94a75f19c",
+    "semantic_hash": "e8efbf5f2da2d08a26c488a94a75f19c"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/typescript/claude-api/batches.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "6a46f62baa00af23d1915c708024e393",
+    "semantic_hash": "6a46f62baa00af23d1915c708024e393"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/typescript/claude-api/files-api.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "795b64b84c501c747f8f59d3bbf86d70",
+    "semantic_hash": "795b64b84c501c747f8f59d3bbf86d70"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/typescript/claude-api/streaming.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "d5e5d3685dc9bd3b9742fcb59b79555d",
+    "semantic_hash": "d5e5d3685dc9bd3b9742fcb59b79555d"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/typescript/claude-api/tool-use.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "2b644fa6996a3ae2d108d6969249c0a3",
+    "semantic_hash": "2b644fa6996a3ae2d108d6969249c0a3"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/claude-api/typescript/managed-agents/README.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "02d566e731ccad57c5b4f7a7c7acddeb",
+    "semantic_hash": "02d566e731ccad57c5b4f7a7c7acddeb"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.agents/skills/everything-claude-code-conventions/SKILL.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "965fbd50b34c27d73ef72fd409be5eb0",
+    "semantic_hash": "965fbd50b34c27d73ef72fd409be5eb0"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/CLAUDE.md": {
+    "mtime": 1780667641.235287,
+    "ast_hash": "db73b0edd7ffbc61ceac177130730865",
+    "semantic_hash": "db73b0edd7ffbc61ceac177130730865"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/SKILL.md": {
+    "mtime": 1780667641.2350626,
+    "ast_hash": "1acfc5e3ff91c92373909c5c11f55769",
+    "semantic_hash": "1acfc5e3ff91c92373909c5c11f55769"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/references/add-watch.md": {
+    "mtime": 1780665474.5037284,
+    "ast_hash": "0df0589623217ca38a12bdcabfb42f4c",
+    "semantic_hash": "0df0589623217ca38a12bdcabfb42f4c"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/references/exports.md": {
+    "mtime": 1780665474.5047283,
+    "ast_hash": "7fb1a81aca17a462db70684a324fcfb0",
+    "semantic_hash": "7fb1a81aca17a462db70684a324fcfb0"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1780665474.5047283,
+    "ast_hash": "24808b03abfeaf5f6435bb69c0125b2c",
+    "semantic_hash": "24808b03abfeaf5f6435bb69c0125b2c"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1780665474.5047283,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": "cde13df085e4c492aeb7ba298a996d0d"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/references/hooks.md": {
+    "mtime": 1780665474.5057282,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": "3f545db6ce646650bb9de588f5512a27"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/references/query.md": {
+    "mtime": 1780665474.5057282,
+    "ast_hash": "8b40ed8c9e9060fc215219a8fc964091",
+    "semantic_hash": "8b40ed8c9e9060fc215219a8fc964091"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/references/transcribe.md": {
+    "mtime": 1780665474.5057282,
+    "ast_hash": "70f6aa30d6211f3a2c7e9fc45479f50c",
+    "semantic_hash": "70f6aa30d6211f3a2c7e9fc45479f50c"
+  },
+  "/home/baqir/Projects/Windows-optimizer/.claude/skills/graphify/references/update.md": {
+    "mtime": 1780665475.3167312,
+    "ast_hash": "735932eaa4f0c8fef9566c538ae3e5f8",
+    "semantic_hash": "735932eaa4f0c8fef9566c538ae3e5f8"
+  },
+  "/home/baqir/Projects/Windows-optimizer/CLAUDE.md": {
+    "mtime": 1780667641.2355618,
+    "ast_hash": "82efb97a359f5c7290bf2513d14686be",
+    "semantic_hash": "82efb97a359f5c7290bf2513d14686be"
+  },
+  "/home/baqir/Projects/Windows-optimizer/docs/PRD.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "3b92102558f80ec50f9f2f31d123225a",
+    "semantic_hash": "3b92102558f80ec50f9f2f31d123225a"
+  },
+  "/home/baqir/Projects/Windows-optimizer/docs/RELEASE_NOTES.md": {
+    "mtime": 1779835253.3446841,
+    "ast_hash": "f7383227fdcf52b30d255eeb72f3d09d",
+    "semantic_hash": "f7383227fdcf52b30d255eeb72f3d09d"
+  },
+  "/home/baqir/Projects/Windows-optimizer/docs/Summary.md": {
+    "mtime": 1780662327.4861882,
+    "ast_hash": "3953bd65996f8e1796a4eae6d64bba91",
+    "semantic_hash": "3953bd65996f8e1796a4eae6d64bba91"
+  },
+  "/home/baqir/Projects/Windows-optimizer/docs/library.txt": {
+    "mtime": 1780668592.212274,
+    "ast_hash": "e6d9108b5382dfcfc5974307ada89294",
+    "semantic_hash": "e6d9108b5382dfcfc5974307ada89294"
+  },
+  "/home/baqir/Projects/Windows-optimizer/docs/talks.md": {
+    "mtime": 1779834309.000593,
+    "ast_hash": "5380450bbe4fdaa73cb8b4ab19c0a4f5",
+    "semantic_hash": "5380450bbe4fdaa73cb8b4ab19c0a4f5"
+  }
+}
